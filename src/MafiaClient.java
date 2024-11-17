@@ -52,19 +52,27 @@ public class MafiaClient {
 
             System.out.println(in.readLine()); // 서버 환영 메시지 출력
 
-            while (true) {
-                System.out.print("Enter target player (e.g., Player2): ");
-                String target = scanner.nextLine();
+            String serverMessage = null;
+            while ((serverMessage = in.readLine()) != null) {
+//                System.out.println("Server: " + serverMessage);
+                if (serverMessage.startsWith("Game Started!")) {
+                    System.out.println("Server: " + serverMessage);
+                }
+                else if (serverMessage.startsWith("Your Turn")) {
+                    System.out.println("Server: " + serverMessage);
+                    String target = scanner.nextLine();
 
-                // JSON 요청 생성
-                ClientAction action = new ClientAction("shoot", target);
-                String actionJson = JsonUtil.actionToJson(action);
-                out.println(actionJson);
-
-                // 서버로부터 JSON 응답 수신
-                String response = in.readLine();
-                ServerResponse serverResponse = JsonUtil.jsonToResponse(response);
-                System.out.println("Server: " + serverResponse.message);
+                    // JSON 요청 생성
+                    ClientAction action = new ClientAction("shoot", target);
+                    String actionJson = JsonUtil.actionToJson(action);
+                    out.println(actionJson);
+                }
+                else if(serverMessage.startsWith("{")) {
+                    // 서버로부터 JSON 응답 수신
+                    ServerResponse serverResponse = JsonUtil.jsonToResponse(serverMessage);
+                    System.out.println("Server: " + serverResponse.message);
+                    out.println("TE");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

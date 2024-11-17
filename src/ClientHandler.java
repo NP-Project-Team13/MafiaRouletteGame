@@ -28,12 +28,17 @@ public class ClientHandler extends Thread {
             MafiaServer.players.put(playerId, player);
 
             out.println("Welcome " + playerId + "!");
+            if(MafiaServer.clients.size() < MafiaServer.MAX_PLAYERS) {
+                out.println("Waiting for other players...");
+            }
 
             // 클라이언트로부터 JSON 요청 수신
             String message;
             while ((message = in.readLine()) != null) {
-                ClientAction action = JsonUtil.jsonToAction(message);
-                processAction(action);
+                if(message.startsWith("{")){
+                    ClientAction action = JsonUtil.jsonToAction(message);
+                    processAction(action);
+                }
             }
         } catch (IOException e) {
             System.out.println("Connection with " + playerId + " closed.");
@@ -49,7 +54,7 @@ public class ClientHandler extends Thread {
     }
 
     // 액션 처리 메서드
-    private void processAction(ClientAction action) {
+    public void processAction(ClientAction action) {
         if ("shoot".equals(action.action)) {
             synchronized (MafiaServer.players) {
                 Player targetPlayer = MafiaServer.players.get(action.target);
@@ -77,4 +82,9 @@ public class ClientHandler extends Thread {
         out.println(message);
     }
 
+    public String receiveMessage() throws IOException {
+        return in.readLine();
+    }
+
+    public String getPlayerId() { return playerId; }
 }
