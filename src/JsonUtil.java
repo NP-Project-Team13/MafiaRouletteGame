@@ -1,7 +1,7 @@
 public class JsonUtil {
     // 클라이언트의 행동을 JSON 문자열로 변환
     public static String actionToJson(ClientAction action) {
-        return "{ \"action\": \"" + action.action + "\", \"target\": \"" + action.target + "\" }";
+        return "{ \"action\": \"" + action.getAction() + "\", \"target\": \"" + action.getTarget() + "\" }";
     }
 
     // JSON 문자열을 `ClientAction` 객체로 변환
@@ -14,9 +14,9 @@ public class JsonUtil {
 
     // 서버의 응답을 JSON 문자열로 변환
     public static String responseToJson(ServerResponse response) {
-        return "{ \"action\": \"" + response.action + "\", \"initiating_player\": \"" + response.initiatingPlayer + "\", " +
-                "\"target_player\": \"" + response.targetPlayer + "\", \"result\": \"" + response.result + "\", " +
-                "\"target_health\": " + response.targetHealth + ", \"message\": \"" + response.message + "\" }";
+        return "{ \"action\": \"" + response.getAction() + "\", \"initiating_player\": \"" + response.getInitiatingPlayer() + "\", " +
+                "\"target_player\": \"" + response.getTargetPlayer() + "\", \"result\": \"" + response.getResult() + "\", " +
+                "\"target_health\": " + response.getTargetHealth() + ", \"message\": \"" + response.getMessage() + "\" }";
     }
 
     // JSON 문자열을 `ServerResponse` 객체로 변환
@@ -31,3 +31,4 @@ public class JsonUtil {
         return new ServerResponse(action, initiatingPlayer, targetPlayer, result, targetHealth, message);
     }
 }
+
