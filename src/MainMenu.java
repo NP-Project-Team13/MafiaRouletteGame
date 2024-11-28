@@ -60,8 +60,16 @@ public class MainMenu {
 
         // 버튼 이벤트
         startButton.addActionListener(e -> {
+            // 클라이언트 연결 설정
+            String serverAddress = JOptionPane.showInputDialog(frame, "서버 주소를 입력하세요:", "localhost");
+            int serverPort = Integer.parseInt(JOptionPane.showInputDialog(frame, "서버 포트를 입력하세요:", "12345"));
+            String nickname = JOptionPane.showInputDialog(frame, "닉네임을 입력하세요: ");
+
+            MafiaClient client = new MafiaClient(serverAddress, serverPort, nickname); // 클라이언트 인스턴스 생성
+            client.start(); // 서버와의 연결 시작
+
             frame.dispose();
-            new GameUI().createAndShowGUI();
+            new GameUI(client).createAndShowGUI();
         });
 
         rulesButton.addActionListener(e -> JOptionPane.showMessageDialog(frame,

@@ -1,3 +1,5 @@
+import characters.Character0;
+
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
@@ -68,22 +70,15 @@ public class MafiaClient {
         }
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    public void sendAbilityRequest(Character0 character) {
+        String targetNickname = "타겟의 닉네임"; // 타겟의 닉네임을 UI에서 수집하는 방법으로 변경해야 합니다.
+        ClientAction action = new ClientAction("useAbility", targetNickname);
+        out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
+    }
 
-        System.out.print("서버 주소를 입력하세요 (기본값: localhost): ");
-        String serverAddress = scanner.nextLine();
-        if (serverAddress.isEmpty()) serverAddress = "localhost";
-
-        System.out.print("서버 포트를 입력하세요 (기본값: 12345): ");
-        String portInput = scanner.nextLine();
-        int serverPort = portInput.isEmpty() ? 12345 : Integer.parseInt(portInput);
-
-        System.out.print("닉네임을 입력하세요: ");
-        String nickname = scanner.nextLine().trim();
-
-        MafiaClient client = new MafiaClient(serverAddress, serverPort, nickname);
-
-        client.start();
+    public void sendShootRequest(Character0 shooter, Character0 target, int currentSlot) {
+        String targetNickname = target.getName(); // 타겟의 이름
+        ClientAction action = new ClientAction("shoot", targetNickname);
+        out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
     }
 }
