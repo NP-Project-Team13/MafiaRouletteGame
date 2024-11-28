@@ -242,7 +242,7 @@ public class GameUI {
         if (confirm == JOptionPane.YES_OPTION) {
             frame.dispose(); // 현재 창 닫기
             System.out.println("뒤로가기 버튼 클릭됨. 메인 메뉴로 이동합니다.");
-            MainMenu.createAndShowGUI(); // 메인 메뉴 화면으로 돌아가기
+            MainMenu.createAndShowGUI(client, client.getGameUI()); // 메인 메뉴 화면으로 돌아가기
         }
     }
 
@@ -255,5 +255,18 @@ public class GameUI {
             }
         }
         return count;
+    }  // 서버 응답 처리 메소드 추가
+    public void handleServerResponse(ServerResponse response) {
+        // 서버 응답에 따라 UI 업데이트 로직 추가
+        switch (response.getAction()) {
+            case "shoot", "useAbility":
+                logMessage(response.getMessage());
+                break;
+            // 추가적인 응답 처리 로직
+            default:
+                logMessage("알 수 없는 행동: " + response.getAction());
+                break;
+        }
+        updatePlayerInfoPanel(); // UI 업데이트
     }
 }
