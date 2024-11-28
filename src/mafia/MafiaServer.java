@@ -91,8 +91,6 @@ public class MafiaServer {
 
     private void startGame() {
         while (true) {
-            startVote();
-
             // 라운드 시작 브로드캐스트
             broadcast("===== 라운드 " + currentRound + " 시작 =====");
 
