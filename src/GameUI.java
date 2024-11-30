@@ -1,4 +1,4 @@
-import characters.Character0; // Character0로 변경
+import characters.CharacterTemplate; // Character0로 변경
 import characters.Character1;
 
 import javax.swing.*;
@@ -11,7 +11,7 @@ public class GameUI {
     private JLabel turnLabel;
     private JPanel playerInfoPanel;
     private MafiaClient client; // 클라이언트 인스턴스 추가
-    private ArrayList<Character0> characters; // Character0 리스트로 변경
+    private ArrayList<CharacterTemplate> characters; // Character0 리스트로 변경
     private int currentPlayerIndex;
     private int roundNumber = 1;
     private static final int CYLINDER_SIZE = 5;
@@ -113,7 +113,7 @@ public class GameUI {
 
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
-        for (Character0 character : characters) {
+        for (CharacterTemplate character : characters) {
             JPanel playerPanel = new JPanel();
             playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
             playerPanel.setBorder(BorderFactory.createTitledBorder(character.getName()));
@@ -164,8 +164,8 @@ public class GameUI {
         updatePlayerInfoPanel();
     }
 
-    private void shoot(Character0 currentCharacter) {
-        Character0 target = selectTarget("타겟을 선택하세요");
+    private void shoot(CharacterTemplate currentCharacter) {
+        CharacterTemplate target = selectTarget("타겟을 선택하세요");
         if (target == null) return;
 
         logMessage(currentCharacter.getName() + "이(가) " + target.getName() + "을(를) 향해 슬롯 " + currentSlot + "에서 총을 쏩니다!");
@@ -191,7 +191,7 @@ public class GameUI {
         return false;
     }
 
-    private void useAbility(Character0 currentCharacter) {
+    private void useAbility(CharacterTemplate currentCharacter) {
         if (currentCharacter.isAbilityUsed()) {
             logMessage(currentCharacter.getName() + "은(는) 이미 능력을 사용했습니다.");
             return;
@@ -208,8 +208,8 @@ public class GameUI {
         turnLabel.setText("현재 턴: " + characters.get(currentPlayerIndex).getName() + " | 라운드: " + roundNumber);
     }
 
-    private Character0 selectTarget(String message) {
-        return (Character0) JOptionPane.showInputDialog(
+    private CharacterTemplate selectTarget(String message) {
+        return (CharacterTemplate) JOptionPane.showInputDialog(
                 null,
                 message,
                 "대상 선택",
@@ -221,7 +221,7 @@ public class GameUI {
     }
 
     private void resetCharacterAbilities() {
-        for (Character0 character : characters) {
+        for (CharacterTemplate character : characters) {
             if (character.isAlive()) {
                 character.resetAbilityUsage();
             }
@@ -249,7 +249,7 @@ public class GameUI {
 
     private int alivePlayerCount() {
         int count = 0;
-        for (Character0 character : characters) {
+        for (CharacterTemplate character : characters) {
             if (character.isAlive()) {
                 count++;
             }

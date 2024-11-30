@@ -1,9 +1,8 @@
-import characters.Character0;
+import characters.CharacterTemplate;
 
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
 
 public class MafiaClient {
     private Socket socket;
@@ -95,13 +94,13 @@ public class MafiaClient {
         return gameUI;
     }
 
-    public void sendAbilityRequest(Character0 character) {
+    public void sendAbilityRequest(CharacterTemplate character) {
         String targetNickname = "타겟의 닉네임"; // 타겟의 닉네임을 UI에서 수집하는 방법으로 변경해야 합니다.
         ClientAction action = new ClientAction("useAbility", targetNickname);
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
     }
 
-    public void sendShootRequest(Character0 shooter, Character0 target, int currentSlot) {
+    public void sendShootRequest(CharacterTemplate shooter, CharacterTemplate target, int currentSlot) {
         String targetNickname = target.getName(); // 타겟의 이름
         ClientAction action = new ClientAction("shoot", targetNickname);
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송

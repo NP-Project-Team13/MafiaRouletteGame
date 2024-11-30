@@ -3,7 +3,7 @@ package characters;
 
 import java.util.Random;
 
-public class Character7 extends Character0 {
+public class Character7 extends CharacterTemplate {
 
     protected boolean isReady = false; // 능력 발동 여부
 
@@ -12,7 +12,7 @@ public class Character7 extends Character0 {
     }
 
     @Override
-    public void shoot(Character0 target) {
+    public void shoot(CharacterTemplate target) {
         if (health <= 0) {
             System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
             return;
@@ -37,7 +37,7 @@ public class Character7 extends Character0 {
 
 
     @Override
-    public void useAbility(Character0... targets) {
+    public void useAbility(CharacterTemplate... targets) {
         if (health <= 0) {
             System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
             return;
