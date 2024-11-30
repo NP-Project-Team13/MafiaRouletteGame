@@ -1,80 +1,116 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.Random;
-public class ClientHandler extends Thread {
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
-    private String playerId;
-    private int health = 3;
-    private static final int CYLINDER_SIZE = 5;
+import java.io.*;
+import java.net.*;
 
-    public ClientHandler(Socket socket) {
+import characters.Character0;
+
+public class ClientHandler implements Runnable {
+    private Socket socket;
+    private MafiaServer server;
+    private PrintWriter out;
+    private BufferedReader in;
+    private String nickname;
+    private Character0 character;
+    private String teams;
+
+    public ClientHandler(Socket socket, MafiaServer server) {
         this.socket = socket;
+        this.server = server;
+        try {
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
         try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            // 닉네임 수신
+            System.out.println("클라이언트에서 닉네임을 기다리는 중...");
+            this.nickname = in.readLine(); // 닉네임 수신
+            System.out.println("닉네임 입력 완료: " + this.nickname); // 디버깅용 로그
 
-            // 플레이어 ID 생성 및 공유 자원에 등록
-            playerId = "Player" + (MafiaServer.players.size() + 1);
-            Player player = new Player(playerId, health);
-            MafiaServer.players.put(playerId, player);
+            // 클라이언트에 대기 메시지 전송
+            sendMessage("게임 대기 중...");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-            out.println("Welcome " + playerId + "!");
+    public boolean isNicknameSet() {
+        return nickname != null && !nickname.trim().isEmpty();
+    }
 
-            // 클라이언트로부터 JSON 요청 수신
-            String message;
-            while ((message = in.readLine()) != null) {
-                ClientAction action = JsonUtil.jsonToAction(message);
-                processAction(action);
+    public void startTurn() {
+        sendMessage("당신의 턴입니다. '총 쏘기' 또는 '능력 사용'을 선택하세요:");
+        try {
+            String actionJson = in.readLine();
+            ClientAction action = JsonUtil.jsonToAction(actionJson);
+
+            if ("shoot".equalsIgnoreCase(action.getAction())) {
+                server.handleShoot(this, action.getTarget());
+            } else if ("useAbility".equalsIgnoreCase(action.getAction())) {
+                // 능력 사용 처리 추가 가능
+                handleUseAbility(action.getTarget());
             }
         } catch (IOException e) {
-            System.out.println("Connection with " + playerId + " closed.");
-        } finally {
-            try {
-                socket.close();
-                MafiaServer.players.remove(playerId);
-                MafiaServer.clients.remove(this);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
     }
 
-    // 액션 처리 메서드
-    private void processAction(ClientAction action) {
-        if ("shoot".equals(action.action)) {
-            synchronized (MafiaServer.players) {
-                Player targetPlayer = MafiaServer.players.get(action.target);
-                if (targetPlayer != null && targetPlayer.getHealth() > 0) {
-                    int shootResult = new Random().nextInt(CYLINDER_SIZE);
-                    String result = (shootResult == 0) ? "hit" : "miss";
-                    if ("hit".equals(result)) {
-                        targetPlayer.decreaseHealth();
-                    }
-
-                    // 모든 클라이언트에 JSON 응답 전송
-                    ServerResponse response = new ServerResponse(
-                            "shoot", playerId, action.target, result, targetPlayer.getHealth(),
-                            playerId + " shot " + action.target + ". " + action.target + "'s health is now " + targetPlayer.getHealth()
-                    );
-                    String jsonResponse = JsonUtil.responseToJson(response);
-                    MafiaServer.broadcast(jsonResponse);
-                }
+    // 능력 사용 처리
+    private void handleUseAbility(String targetNickname) {
+        try {
+            if (character == null) {
+                sendMessage("캐릭터가 설정되지 않았습니다.");
+                return;
             }
+
+            // 타겟을 찾음
+            ClientHandler target = server.clients.stream()
+                    .filter(client -> client.getNickname().equals(targetNickname))
+                    .findFirst()
+                    .orElse(null);
+
+            if (target != null) {
+                character.useAbility(target.getCharacter());
+                sendMessage("능력을 사용했습니다: " + character.getInfo());
+            } else {
+                character.useAbility();
+                sendMessage("능력을 사용했습니다: " + character.getInfo());
+            }
+        } catch (Exception e) {
+            sendMessage("능력 사용에 실패했습니다: " + e.getMessage());
         }
     }
 
-    // 클라이언트에게 메시지 전송
     public void sendMessage(String message) {
         out.println(message);
     }
 
+    public void closeConnection() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public Character0 getCharacter() {
+        return character;
+    }
+
+    public void setCharacter(Character0 character) {
+        this.character = character;
+    }
+
+    public void setTeam(String team) {
+        this.teams = team;
+    }
 }
+
