@@ -3,6 +3,7 @@ import characters.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MafiaServer {
     private static final int PORT = 12345;
@@ -96,6 +97,9 @@ public class MafiaServer {
             for (int i = 0; i < clients.size(); i++) {
                 ClientHandler currentPlayer = clients.get(currentTurnIndex);
 
+                // 게임 상태 전송
+                sendGameStateToClients();
+
                 // 턴 시작 브로드캐스트
                 broadcast("현재 턴: " + currentPlayer.getNickname() + "의 턴입니다.");
                 currentPlayer.startTurn();
@@ -106,12 +110,28 @@ public class MafiaServer {
                     endGame();
                     return;
                 }
+
             }
             broadcast("라운드가 종료되었습니다. 다음 라운드를 준비합니다.");
 
             currentRound++; // 라운드 증가
         }
     }
+
+    private void sendGameStateToClients() {
+        List<CharacterTemplate> characters = clients.stream()
+                .map(ClientHandler::getCharacter)
+                .collect(Collectors.toList());
+
+        List<Boolean> chambers = gun.getChambers();
+
+        int currentPlayerIndex = currentTurnIndex;
+        int roundNumber = currentRound;
+
+        clients.forEach(client -> sendResponse(client,
+                new ServerResponse("updateGameState", "게임 상태 업데이트", characters, chambers, roundNumber, currentPlayerIndex)));
+    }
+
 
     public void handleShoot(ClientHandler shooter, String targetNickname) {
         ClientHandler target = clients.stream()
@@ -120,7 +140,7 @@ public class MafiaServer {
                 .orElse(null);
 
         if (target == null) {
-            sendResponse(shooter, new ServerResponse("shoot", shooter.getNickname(), targetNickname, "miss", 0, "타겟 플레이어를 찾을 수 없습니다."));
+            sendResponse(shooter, new ServerResponse("shoot", "타겟 플레이어를 찾을 수 없습니다.", null, null, 0, 0));
             return;
         }
 
@@ -132,12 +152,11 @@ public class MafiaServer {
             targetHealth--;
         }
 
-        sendResponse(shooter, new ServerResponse("shoot", shooter.getNickname(), targetNickname, hit ? "hit" : "miss", targetHealth,
-                hit ? targetNickname + "에게 데미지를 입혔습니다." : targetNickname + "을(를) 빗맞췄습니다."));
+        sendResponse(shooter, new ServerResponse("shoot", hit ? targetNickname + "에게 데미지를 입혔습니다." : targetNickname + "을(를) 빗맞췄습니다.", null, null, 0, 0));
 
         if (hit) {
-            sendResponse(target, new ServerResponse("hit", shooter.getNickname(), targetNickname, "hit", targetHealth,
-                    shooter.getNickname() + "에게 총을 맞았습니다. 체력이 1 감소합니다."));
+            sendResponse(shooter, new ServerResponse("shoot", shooter.getNickname() + "에게 총을 맞았습니다. 체력이 1 감소합니다.", null, null, 0, 0));
+
         }
 
         broadcast(shooter.getNickname() + "이(가) " + targetNickname + "을(를) " + (hit ? "적중시켰습니다!" : "빗맞췄습니다!"));
