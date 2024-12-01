@@ -1,9 +1,7 @@
-package mafia;
-
 import java.io.*;
 import java.net.*;
-import mafia.JsonUtil;
-import mafia.characters.Character0;
+
+import characters.CharacterTemplate;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -11,9 +9,8 @@ public class ClientHandler implements Runnable {
     private PrintWriter out;
     private BufferedReader in;
     private String nickname;
-    private Character0 character;
+    private CharacterTemplate character;
     private String teams;
-    private int voteNum = -1;
 
     public ClientHandler(Socket socket, MafiaServer server) {
         this.socket = socket;
@@ -62,23 +59,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void votePlayer() {
-        try {
-            String playerNum = in.readLine();
-            voteNum = Integer.parseInt(playerNum);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean isVoteCompleted() {
-        return voteNum != -1;
-    }
-
-    public int getVoteNum() {
-        return voteNum;
-    }
-
     // 능력 사용 처리
     private void handleUseAbility(String targetNickname) {
         try {
@@ -121,11 +101,11 @@ public class ClientHandler implements Runnable {
         return nickname;
     }
 
-    public Character0 getCharacter() {
+    public CharacterTemplate getCharacter() {
         return character;
     }
 
-    public void setCharacter(Character0 character) {
+    public void setCharacter(CharacterTemplate character) {
         this.character = character;
     }
 
@@ -133,4 +113,3 @@ public class ClientHandler implements Runnable {
         this.teams = team;
     }
 }
-

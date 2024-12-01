@@ -1,4 +1,3 @@
-package mafia;
 
 public class ServerResponse {
     private String action;
@@ -65,4 +64,3 @@ public class ServerResponse {
         this.message = message;
     }
 }
-

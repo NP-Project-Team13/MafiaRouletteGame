@@ -1,5 +1,3 @@
-package mafia;
-
 public class ClientAction {
     private String action; // "shoot" 또는 "useAbility"
     private String target; // 타겟 플레이어 닉네임
@@ -25,4 +23,3 @@ public class ClientAction {
         this.target = target;
     }
 }
-

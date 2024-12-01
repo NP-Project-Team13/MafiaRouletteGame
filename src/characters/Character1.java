@@ -1,7 +1,7 @@
 // 1. 총알 위치를 확인하는 능력
-package mafia.characters;
+package characters;
 
-public class Character1 extends Character0 {
+public class Character1 extends CharacterTemplate {
 
     public Character1(String name, String team) {
         super(name, team, "총알 위치를 확인하는 능력");
@@ -9,7 +9,7 @@ public class Character1 extends Character0 {
 
     // 외부에서 총알 위치 확인 로직 구현 필요
     @Override
-    public void useAbility(Character0... targets) {
+    public void useAbility(CharacterTemplate... targets) {
         if (health <= 0) {
             System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
             return;

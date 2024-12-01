@@ -1,4 +1,3 @@
-package mafia;
 public class JsonUtil {
     // 클라이언트의 행동을 JSON 문자열로 변환
     public static String actionToJson(ClientAction action) {
