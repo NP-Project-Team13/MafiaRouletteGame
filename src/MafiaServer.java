@@ -80,8 +80,8 @@ public class MafiaServer {
                 client.setTeam(teams[i]);
 
                 // 클라이언트에게 할당 정보 전달
-                client.sendMessage("당신은 " + teams[i] + "팀입니다.");
-                client.sendMessage("캐릭터: " + characterClass.getSimpleName() + " - 능력: " + character.getInfo());
+//                client.sendMessage("당신은 " + teams[i] + "팀입니다.");
+//                client.sendMessage("캐릭터: " + characterClass.getSimpleName() + " - 능력: " + character.getInfo());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -91,7 +91,7 @@ public class MafiaServer {
     private void startGame() {
         while (true) {
             // 라운드 시작 브로드캐스트
-            broadcast("===== 라운드 " + currentRound + " 시작 =====");
+//            broadcast("===== 라운드 " + currentRound + " 시작 =====");
 
             // 모든 플레이어의 턴 진행
             for (int i = 0; i < clients.size(); i++) {
@@ -101,7 +101,7 @@ public class MafiaServer {
                 sendGameStateToClients();
 
                 // 턴 시작 브로드캐스트
-                broadcast("현재 턴: " + currentPlayer.getNickname() + "의 턴입니다.");
+//                broadcast("현재 턴: " + currentPlayer.getNickname() + "의 턴입니다.");
                 currentPlayer.startTurn();
 
                 currentTurnIndex = (currentTurnIndex + 1) % clients.size();
@@ -112,7 +112,7 @@ public class MafiaServer {
                 }
 
             }
-            broadcast("라운드가 종료되었습니다. 다음 라운드를 준비합니다.");
+//            broadcast("라운드가 종료되었습니다. 다음 라운드를 준비합니다.");
 
             currentRound++; // 라운드 증가
         }

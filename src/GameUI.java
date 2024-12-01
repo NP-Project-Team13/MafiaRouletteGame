@@ -1,21 +1,20 @@
 import characters.CharacterTemplate; // Character0로 변경
-import characters.Character1;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 
 public class GameUI {
     private JTextArea gameLog;
     private JLabel turnLabel;
     private JPanel playerInfoPanel;
     private MafiaClient client; // 클라이언트 인스턴스 추가
-    private ArrayList<CharacterTemplate> characters; // Character0 리스트로 변경
+    private List<CharacterTemplate> characters; // Character0 리스트로 변경
     private int currentPlayerIndex;
     private int roundNumber = 1;
     private static final int CYLINDER_SIZE = 5;
-    private boolean[] bulletPositions;
+    private List<Boolean> bulletPositions;
     private int turnCounter = 0;
     private int currentSlot = 1;
 
@@ -105,8 +104,8 @@ public class GameUI {
 
     private String getBulletPositionsString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bulletPositions.length; i++) {
-            if (bulletPositions[i]) {
+        for (int i = 0; i < bulletPositions.size(); i++) {
+            if (bulletPositions.get(i)) {
                 sb.append(i + 1).append(" ");
             }
         }
@@ -301,11 +300,13 @@ public class GameUI {
         logMessage(response.getMessage());
 
         // 플레이어 정보 업데이트
+        characters = response.getCharacters();
         for (CharacterTemplate character : response.getCharacters()) {
             logMessage(" - 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
         }
 
         // 총알 슬롯 상태 업데이트
+        bulletPositions = response.getChambers();
         StringBuilder chamberStatus = new StringBuilder("총알 슬롯 상태: ");
         for (int i = 0; i < response.getChambers().size(); i++) {
             chamberStatus.append("슬롯 ").append(i + 1).append(": ")

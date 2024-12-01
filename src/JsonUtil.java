@@ -1,3 +1,4 @@
+import characters.Character1;
 import characters.CharacterTemplate;
 
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class JsonUtil {
     // JSON 문자열을 `ServerResponse` 객체로 변환
     public static ServerResponse jsonToResponse(String json) {
         String[] parts = json.replace("{", "").replace("}", "").replace("\"", "").split(",");
+
         String action = parts[0].split(":")[1].trim();
         String message = parts[1].split(":")[1].trim();
         int roundNumber = Integer.parseInt(parts[2].split(":")[1].trim());
@@ -66,13 +68,42 @@ public class JsonUtil {
 
         // 플레이어 정보 리스트 변환
         List<CharacterTemplate> characters = new ArrayList<>();
-        // (여기서는 JSON 문자열에서 각 캐릭터 정보를 파싱하여 리스트를 채워야 합니다.)
+
+        // JSON 문자열에서 "characters" 부분 찾기
+        String charactersJson = json.substring(json.indexOf("\"characters\": [") + "\"characters\": [".length(),
+                json.indexOf("],", json.indexOf("\"characters\": [")));
+
+        if (!charactersJson.trim().isEmpty()) {
+            String[] characterEntries = charactersJson.split("\\},");
+            for (String entry : characterEntries) {
+                entry += "}"; // 각 캐릭터 JSON 문자열의 끝을 맞추기 위해 추가
+                String name = entry.split(",")[0].split(":")[1].trim(); // 이름
+                String team = entry.split(",")[1].split(":")[1].trim(); // 팀
+                int health = Integer.parseInt(entry.split(",")[2].split(":")[1].trim()); // 체력
+
+                // 새로운 CharacterTemplate 객체 생성 (Character1 등으로 대체해야 할 수 있음)
+                CharacterTemplate character = new Character1(name, team); // 여기에 적절한 캐릭터 클래스 사용
+                character.setHealth(health); // 체력 설정
+                characters.add(character); // 리스트에 추가
+            }
+        }
 
         // 총알 상태 리스트 변환
         List<Boolean> chambers = new ArrayList<>();
-        // (여기서는 JSON 문자열에서 총알 상태를 파싱하여 리스트를 채워야 합니다.)
+
+        // JSON 문자열에서 "chambers" 부분 찾기
+        String chambersJson = json.substring(json.indexOf("\"chambers\": [") + "\"chambers\": [".length(),
+                json.indexOf("]", json.indexOf("\"chambers\": [")));
+
+        if (!chambersJson.trim().isEmpty()) {
+            String[] chamberEntries = chambersJson.split(",");
+            for (String chamber : chamberEntries) {
+                chambers.add(Boolean.parseBoolean(chamber.trim())); // 각 슬롯의 상태를 추가
+            }
+        }
 
         return new ServerResponse(action, message, characters, chambers, roundNumber, currentPlayerIndex);
     }
+
 }
 
