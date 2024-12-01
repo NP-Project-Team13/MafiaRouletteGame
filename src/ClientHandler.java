@@ -11,6 +11,7 @@ public class ClientHandler implements Runnable {
     private String nickname;
     private CharacterTemplate character;
     private String teams;
+    private int voteNum = -1;
 
     public ClientHandler(Socket socket, MafiaServer server) {
         this.socket = socket;
@@ -57,6 +58,23 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void votePlayer() {
+        try {
+            String playerNum = in.readLine();
+            voteNum = Integer.parseInt(playerNum);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isVoteCompleted() {
+        return voteNum != -1;
+    }
+
+    public int getVoteNum() {
+        return voteNum;
     }
 
     // 능력 사용 처리

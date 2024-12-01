@@ -173,9 +173,48 @@ public class MafiaServer {
                 .orElse("없음");
         broadcast(winner + "이(가) 승리했습니다!");
 
+        startVote();
+
         for (ClientHandler client : clients) {
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
+        }
+    }
+
+    private void startVote() {
+        broadcast("MVP 투표를 시작합니다!");
+        String playerStr = "";
+        for(int i=0; i<clients.size(); i++) {
+            playerStr += (i + 1 + ") " + clients.get(i).getNickname() + "    ");
+        }
+        broadcast(playerStr);
+
+        for(int i=0; i<clients.size(); i++) {
+            clients.get(i).votePlayer();
+        }
+        voteCount();
+    }
+
+    private void voteCount() {
+        while (true) {
+            boolean allVoteCompleted = clients.stream().allMatch(ClientHandler::isVoteCompleted);
+            if (allVoteCompleted) {
+                System.out.println("모든 플레이어 MVP 투표 완료!");
+                broadcast("모든 플레이어의 투표가 완료되었습니다!");
+
+                ArrayList<Integer> votes = new ArrayList<>();
+                for (int i = 0; i < clients.size(); i++) {
+                    votes.add(0); // 초기값은 0
+                }
+                for (int i = 0; i < clients.size(); i++) {
+                    votes.set(clients.get(i).getVoteNum()-1, votes.get(clients.get(i).getVoteNum()-1) + 1);
+                }
+                int maxIndex = votes.indexOf(Collections.max(votes));
+                String mvpPlayer = clients.get(maxIndex).getNickname();
+                broadcast("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+
+                break;
+            }
         }
     }
 }

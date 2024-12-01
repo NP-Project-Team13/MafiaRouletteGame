@@ -83,6 +83,11 @@ public class MafiaClient {
 //                    ClientAction action = new ClientAction(actionType, target);
 //                    out.println(JsonUtil.actionToJson(action));
 //                }
+//                else if (serverMessage.startsWith("1)")) {
+//                    System.out.print("제일 활약이 좋았던 플레이어의 번호를 선택하세요 : ");
+//                    String voteNum = scanner.nextLine();
+//                    out.println(voteNum);
+//                }
 //            }
 //        } catch (IOException e) {
 //            System.out.println("서버와의 연결이 끊어졌습니다.");
