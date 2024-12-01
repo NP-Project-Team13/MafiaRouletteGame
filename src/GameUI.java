@@ -197,6 +197,16 @@ public class GameUI {
             return;
         }
 
+//        // 타겟 선택을 위한 입력 받기
+//        String targetNickname = JOptionPane.showInputDialog("능력을 사용할 타겟의 닉네임을 입력하세요:");
+//        if (targetNickname == null || targetNickname.trim().isEmpty()) {
+//            logMessage("타겟이 선택되지 않았습니다.");
+//            return;
+//        }
+
+//        // 서버에 능력 사용 요청 전송
+//        client.sendAbilityRequest(currentCharacter, targetNickname);
+
         // 서버에 능력 사용 요청 전송
         client.sendAbilityRequest(currentCharacter);
 
@@ -228,8 +238,9 @@ public class GameUI {
         }
     }
 
-    private void logMessage(String message) {
+    public void logMessage(String message) {
         gameLog.append(message + "\n");
+        gameLog.setCaretPosition(gameLog.getDocument().getLength()); // 자동 스크롤
     }
 
     private void goBack(JFrame frame) {
@@ -255,7 +266,9 @@ public class GameUI {
             }
         }
         return count;
-    }  // 서버 응답 처리 메소드 추가
+    }
+
+    // 서버 응답 처리 메소드 추가
     public void handleServerResponse(ServerResponse response) {
         // 서버 응답에 따라 UI 업데이트 로직 추가
         switch (response.getAction()) {

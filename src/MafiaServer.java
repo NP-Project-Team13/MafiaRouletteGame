@@ -32,7 +32,7 @@ public class MafiaServer {
                 clients.add(clientHandler);
                 new Thread(clientHandler).start();
             }
-            waitForNicknames();
+            waitForReady();
             System.out.println("모든 플레이어가 연결되었습니다. 게임을 시작합니다.");
             assignTeamsAndCharacters();
             startGame();
@@ -42,11 +42,11 @@ public class MafiaServer {
     }
 
     // 모든 클라이언트의 닉네임 입력 완료 대기
-    private void waitForNicknames() {
+    private void waitForReady() {
         while (true) {
-            boolean allNicknamesSet = clients.stream().allMatch(ClientHandler::isNicknameSet);
-            if (allNicknamesSet) {
-                System.out.println("모든 플레이어 닉네임 입력 완료!");
+            boolean allPlayersReady = clients.stream().allMatch(ClientHandler::isReady);
+            if (allPlayersReady) {
+                System.out.println("모든 플레이어 준비 완료!");
                 break;
             }
             try {

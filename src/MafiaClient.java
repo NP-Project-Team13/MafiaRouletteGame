@@ -29,6 +29,7 @@ public class MafiaClient {
             System.exit(1);
         }
     }
+
     public void start() {
         new Thread(() -> {
             try {
@@ -39,7 +40,9 @@ public class MafiaClient {
                         // 서버 응답에 따라 UI 업데이트
                         gameUI.handleServerResponse(response);
                     } else {
-                        System.out.println("서버: " + serverMessage);
+                        // 서버 메시지를 gameLog에 출력
+                        gameUI.logMessage("서버: " + serverMessage);
+//                        System.out.println("서버: " + serverMessage);
                     }
                 }
             } catch (IOException e) {
@@ -94,6 +97,10 @@ public class MafiaClient {
         return gameUI;
     }
 
+    public void sendReady() {
+        out.println(JsonUtil.actionToJson(new ClientAction("ready", nickname))); // 준비 상태 전송
+    }
+
     public void sendAbilityRequest(CharacterTemplate character) {
         String targetNickname = "타겟의 닉네임"; // 타겟의 닉네임을 UI에서 수집하는 방법으로 변경해야 합니다.
         ClientAction action = new ClientAction("useAbility", targetNickname);
@@ -116,7 +123,8 @@ public class MafiaClient {
         String nickname = JOptionPane.showInputDialog(frame, "닉네임을 입력하세요: ");
 
         MafiaClient client = new MafiaClient(serverAddress, serverPort, nickname); // 클라이언트 인스턴스 생성
-            client.start(); // 서버와의 연결 시작
+//        client.start(); // 서버와의 연결 시작
         SwingUtilities.invokeLater(() -> new MainMenu().createAndShowGUI(client, client.gameUI));
     }
+
 }
