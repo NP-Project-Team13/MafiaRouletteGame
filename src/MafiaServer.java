@@ -13,7 +13,7 @@ public class MafiaServer {
     private Gun gun = new Gun();
 
     // 캐릭터 클래스 리스트
-    private List<Class<? extends Character0>> characterClasses = Arrays.asList(
+    private List<Class<? extends CharacterTemplate>> characterClasses = Arrays.asList(
             Character1.class, Character2.class, Character3.class, Character4.class,
             Character5.class, Character6.class, Character7.class
     );
@@ -71,8 +71,8 @@ public class MafiaServer {
 
             try {
                 // 캐릭터 클래스에서 하나 선택 후 인스턴스 생성
-                Class<? extends Character0> characterClass = characterClasses.get(i);
-                Character0 character = characterClass.getConstructor(String.class, String.class)
+                Class<? extends CharacterTemplate> characterClass = characterClasses.get(i);
+                CharacterTemplate character = characterClass.getConstructor(String.class, String.class)
                         .newInstance(client.getNickname(), teams[i]);
 
                 client.setCharacter(character);

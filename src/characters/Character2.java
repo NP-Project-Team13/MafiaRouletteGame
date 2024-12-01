@@ -1,7 +1,7 @@
 // 2. 총알을 튕겨내는 방어 능력
 package characters;
 
-public class Character2 extends Character0 {
+public class Character2 extends CharacterTemplate {
 
     private boolean deflectReady = false; // 총알 튕겨낼 준비 되었는지
 
@@ -10,7 +10,7 @@ public class Character2 extends Character0 {
     }
 
     @Override
-    public void useAbility(Character0... targets) {
+    public void useAbility(CharacterTemplate... targets) {
         if (health <= 0) {
             System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
             return;

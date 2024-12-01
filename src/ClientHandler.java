@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
 
-import characters.Character0;
+import characters.CharacterTemplate;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -9,7 +9,7 @@ public class ClientHandler implements Runnable {
     private PrintWriter out;
     private BufferedReader in;
     private String nickname;
-    private Character0 character;
+    private CharacterTemplate character;
     private String teams;
 
     public ClientHandler(Socket socket, MafiaServer server) {
@@ -101,11 +101,11 @@ public class ClientHandler implements Runnable {
         return nickname;
     }
 
-    public Character0 getCharacter() {
+    public CharacterTemplate getCharacter() {
         return character;
     }
 
-    public void setCharacter(Character0 character) {
+    public void setCharacter(CharacterTemplate character) {
         this.character = character;
     }
 

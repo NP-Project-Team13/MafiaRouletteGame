@@ -2,14 +2,14 @@
 package characters;
 
 
-public class Character3 extends Character0 {
+public class Character3 extends CharacterTemplate {
 
     public Character3(String name, String team) {
         super(name, team,"순서 변경 능력");
     }
 
     @Override
-    public void useAbility(Character0... targets) { // 외부에서 순서 교체 로직 필요
+    public void useAbility(CharacterTemplate... targets) { // 외부에서 순서 교체 로직 필요
         if (health <= 0) {
             System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
             return;
@@ -22,7 +22,7 @@ public class Character3 extends Character0 {
             System.out.println(name + "은(는) 순서를 변경할 대상을 필요로 합니다.");
             return;
         }
-        Character0 target = targets[0];
+        CharacterTemplate target = targets[0];
         System.out.println(name + "은(는) " + target.getName() + "과(와) 순서를 교체했습니다.");
         setAbilityUsed(true);
     }
