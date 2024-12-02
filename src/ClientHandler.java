@@ -92,7 +92,7 @@ public class ClientHandler implements Runnable {
                     .orElse(null);
 
             if (target != null) {
-                character.useAbility(target.getCharacter());
+//                character.useAbility(target.getCharacter());
                 sendMessage("능력을 사용했습니다: " + character.getInfo());
             } else {
                 character.useAbility();

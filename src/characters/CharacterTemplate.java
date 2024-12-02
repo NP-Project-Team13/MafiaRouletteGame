@@ -25,7 +25,7 @@ public abstract class CharacterTemplate implements Serializable {
         this.isAbilityUsed = false;
     }
 
-    public abstract String useAbility(CharacterTemplate... targets);
+    public abstract String useAbility();
 
 
     // 총 쏘기 (이 메서드는 총알이 있을 경우에만 호출된다고 가정)

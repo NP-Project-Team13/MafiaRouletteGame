@@ -9,7 +9,7 @@ public class Character1 extends CharacterTemplate {
 
     // 외부에서 총알 위치 확인 로직 구현 필요
     @Override
-    public String useAbility(CharacterTemplate... targets) {
+    public String useAbility() {
         StringBuilder result = new StringBuilder();
 
         if (health <= 0) {

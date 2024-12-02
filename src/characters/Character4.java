@@ -10,9 +10,9 @@ public class Character4 extends CharacterTemplate {
         super(name, team, "발사 후 아군 전체 또는 적군 전체에게 데미지");
     }
 
-    // 파라미터는 아군 또는 적군 전체 캐릭터들에게 데미지
+
     @Override
-    public String useAbility(CharacterTemplate... targets) {
+    public String useAbility() { // 추후 능력에 맞게 코드 수정 필요
         StringBuilder result = new StringBuilder();
 
         if (health <= 0) {
@@ -25,7 +25,7 @@ public class Character4 extends CharacterTemplate {
         }
         setAbilityUsed(true);
         isReady = true;
-        abilityTargetCharacters = targets;
+//        abilityTargetCharacters = targets;
         result.append(name).append("은(는) 능력을 사용하여 적 전체를 타겟으로 설정했습니다.\n");
         return result.toString();
     }

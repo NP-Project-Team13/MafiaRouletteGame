@@ -11,7 +11,7 @@ public class Character5 extends CharacterTemplate {
     }
 
     @Override
-    public String useAbility(CharacterTemplate... targets) {
+    public String useAbility() {
         StringBuilder result = new StringBuilder();
 
         if (health <= 0) {

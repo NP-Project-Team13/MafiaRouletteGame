@@ -39,7 +39,7 @@ public class Character7 extends CharacterTemplate {
     }
 
     @Override
-    public String useAbility(CharacterTemplate... targets) {
+    public String useAbility() { // 추후 능력에 맞게 코드 수정 필요
         StringBuilder result = new StringBuilder();
 
         if (health <= 0) {
