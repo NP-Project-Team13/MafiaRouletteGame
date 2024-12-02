@@ -10,35 +10,43 @@ public class Character2 extends CharacterTemplate {
     }
 
     @Override
-    public void useAbility(CharacterTemplate... targets) {
+    public String useAbility(CharacterTemplate... targets) {
+        StringBuilder result = new StringBuilder();
+
         if (health <= 0) {
-            System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
-            return;
+            result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
+            return result.toString();
         }
         if (isAbilityUsed) {
-            System.out.println(name + "은(는) 이미 이번 라운드에서 능력을 사용했습니다.");
-            return;
+            result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
+            return result.toString();
         }
         deflectReady = true;
-        System.out.println(name + "은(는) 다음 총알을 튕겨낼 준비가 되었습니다.");
+        result.append(name).append("은(는) 다음 총알을 튕겨낼 준비가 되었습니다.\n");
         setAbilityUsed(true);
+        return result.toString();
     }
 
     @Override
-    public void receiveDamage() {
+    public String receiveDamage() {
+        StringBuilder result = new StringBuilder();
+
         if (deflectReady) {
-            System.out.println(name + "은(는) 총알을 튕겨냈습니다!");
+            result.append(name).append("은(는) 총알을 튕겨냈습니다!\n");
             deflectReady = false;
         } else {
-            System.out.println(name + "이(가) 데미지를 받았습니다.");
+            result.append(name).append("이(가) 데미지를 받았습니다.\n");
             decreaseHealth();
         }
+        return result.toString();
     }
 
     @Override
-    public void resetRound(){
+    public String resetRound() {
+        StringBuilder result = new StringBuilder();
         isAbilityUsed = false;
         deflectReady = false;
+        result.append(name).append("의 상태가 초기화되었습니다.\n");
+        return result.toString();
     }
 }
-

@@ -25,34 +25,43 @@ public abstract class CharacterTemplate implements Serializable {
         this.isAbilityUsed = false;
     }
 
-    public abstract void useAbility(CharacterTemplate... targets);
+    public abstract String useAbility(CharacterTemplate... targets);
 
-    // 데미지 받기
-    public void receiveDamage() {
-        System.out.println(name + "이(가) 데미지를 받았습니다.");
-        decreaseHealth();
-    }
-
-    // 체력 감소
-    public void decreaseHealth() {
-        health--;
-        System.out.println(name + "의 체력이 1 감소했습니다. 남은 체력: " + health);
-        if (health <= 0) {
-            System.out.println(name + "은(는) 사망했습니다.");
-        }
-    }
 
     // 총 쏘기 (이 메서드는 총알이 있을 경우에만 호출된다고 가정)
-    public void shoot(CharacterTemplate target) {
+    public String shoot(CharacterTemplate target) {
+        StringBuilder result = new StringBuilder();
         if (health <= 0) {
-            System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
-            return;
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            return result.toString();
         }
-        System.out.println(name + "이(가) " + target.getName() + "에게 총을 발사했습니다!");
-        target.receiveDamage();
+        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!");
+        result.append(target.receiveDamage());
+        return result.toString();
     }
 
-    public abstract void resetRound();
+    // 데미지 받기 (shoot 당하면 호출되는 메서드)
+    public String receiveDamage() {
+        StringBuilder result = new StringBuilder();
+        result.append(name).append("이(가) 데미지를 받았습니다.");
+        result.append(decreaseHealth());
+        return result.toString();
+    }
+
+    // 체력 감소 (receiveDamage 에서 호출되는 메서드 - 각 캐릭터의 능력에 따라 호출되지 않을 수 있음)
+    public String decreaseHealth() {
+        StringBuilder result = new StringBuilder();
+        health--;
+        result.append(name).append("의 체력이 1 감소했습니다. 남은 체력: ").append(health);
+        if (health <= 0) {
+            result.append(name).append("은(는) 사망했습니다.");
+        }
+        return result.toString();
+    }
+
+
+
+    public abstract String resetRound();
 
     public int getHealth() {
         return health;

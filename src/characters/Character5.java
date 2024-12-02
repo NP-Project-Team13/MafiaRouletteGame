@@ -7,44 +7,54 @@ public class Character5 extends CharacterTemplate {
     protected boolean isReady = false; // 능력 발동 여부
 
     public Character5(String name, String team) {
-        super(name, team,"총에 맞으면 데미지 2배");
+        super(name, team, "총에 맞으면 데미지 2배");
     }
 
     @Override
-    public void useAbility(CharacterTemplate... targets) {
+    public String useAbility(CharacterTemplate... targets) {
+        StringBuilder result = new StringBuilder();
+
         if (health <= 0) {
-            System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
-            return;
+            result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
+            return result.toString();
         }
-        if(!isReceived) {
-            System.out.println("아직 능력을 사용할 수 없습니다.");
+        if (!isReceived) {
+            result.append("아직 능력을 사용할 수 없습니다.\n");
+            return result.toString();
         }
         if (isAbilityUsed) {
-            System.out.println(name + "은(는) 이미 이번 라운드에서 능력을 사용했습니다.");
-            return;
+            result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
+            return result.toString();
         }
-        System.out.println(name + "은(는) 능력을 사용했습니다.");
+        result.append(name).append("은(는) 능력을 사용했습니다.\n");
         setAbilityUsed(true);
         isReady = true;
+        return result.toString();
     }
 
     @Override
-    public void shoot(CharacterTemplate target) {
+    public String shoot(CharacterTemplate target) {
+        StringBuilder result = new StringBuilder();
+
         if (health <= 0) {
-            System.out.println(name + "은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
-            return;
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
+            return result.toString();
         }
-        System.out.println(name + "이(가) " + target.getName() + "에게 총을 발사했습니다!");
-        if(isReady){
-            target.decreaseHealth();
+        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
+        if (isReady) {
+            result.append(target.decreaseHealth());
+            result.append(" 데미지가 2배 적용되었습니다!\n");
             isReady = false;
         }
-        target.decreaseHealth();
+        result.append(target.decreaseHealth());
+        return result.toString();
     }
 
     @Override
-    public void resetRound(){
-        // isAbilityUsed 유지
-        // isReceived 유지
+    public String resetRound() {
+        StringBuilder result = new StringBuilder();
+        // isAbilityUsed와 isReceived 상태는 유지해야 하므로 초기화하지 않음.
+        result.append(name).append("의 라운드가 초기화되었습니다. 능력 사용 가능 상태는 유지됩니다.\n");
+        return result.toString();
     }
 }
