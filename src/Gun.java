@@ -43,4 +43,7 @@ public class Gun {
     public int getBullets() {
         return bullets;
     }
+    public List<Boolean> getChambers() {
+        return chambers;
+    }
 }
