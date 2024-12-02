@@ -1,13 +1,13 @@
-// 5. 총에 맞으면 데미지 2배
+// 5. 상대가 총에 맞으면 데미지 2배 주기 (전체 게임에 걸쳐 1회만 사용 가능)
+// todo 구현 완료
 package characters;
 
 public class Character5 extends CharacterTemplate {
 
-    protected boolean isReceived = false; // 총에 한 번이라도 맞은 경우 true
     protected boolean isReady = false; // 능력 발동 여부
 
     public Character5(String name, String team) {
-        super(name, team, "총에 맞으면 데미지 2배");
+        super(name, team, "상대가 총에 맞으면 데미지 2배 주기");
     }
 
     @Override
@@ -16,10 +16,6 @@ public class Character5 extends CharacterTemplate {
 
         if (health <= 0) {
             result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
-            return result.toString();
-        }
-        if (!isReceived) {
-            result.append("아직 능력을 사용할 수 없습니다.\n");
             return result.toString();
         }
         if (isAbilityUsed) {
@@ -43,18 +39,20 @@ public class Character5 extends CharacterTemplate {
         result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
         if (isReady) {
             result.append(target.decreaseHealth());
+            result.append(target.decreaseHealth());
             result.append(" 데미지가 2배 적용되었습니다!\n");
             isReady = false;
+        }else{
+            result.append(target.decreaseHealth());
         }
-        result.append(target.decreaseHealth());
         return result.toString();
     }
 
     @Override
     public String resetRound() {
         StringBuilder result = new StringBuilder();
-        // isAbilityUsed와 isReceived 상태는 유지해야 하므로 초기화하지 않음.
-        result.append(name).append("의 라운드가 초기화되었습니다. 능력 사용 가능 상태는 유지됩니다.\n");
+        // 이 캐릭터는 능력 상태가 매 라운드에 걸쳐 유지되어야 하므로 초기화하지 않음.
+        result.append(name).append("의 능력 사용 가능 상태는 계속 유지됩니다.\n");
         return result.toString();
     }
 }

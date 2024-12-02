@@ -1,4 +1,5 @@
 // 7. 무작위로 생존 여부가 결정되는 "대박 아니면 쪽박" 능력 (나 아니면 너 OUT → 한명을 지목, 50:50 확률로 둘 중 한 명은 사망)
+// todo 구현 완료
 package characters;
 
 import java.util.Random;
@@ -14,17 +15,16 @@ public class Character7 extends CharacterTemplate {
     @Override
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
-
         if (health <= 0) {
-            result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
             return result.toString();
         }
-        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
-        result.append(target.receiveDamage());
-
-        if (isReady) {
+        if(!isReady){
+            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
+            result.append(target.receiveDamage());
+        } else {
             result.append("\n").append(name).append("은(는) ").append(target.getName())
-                    .append("과(와) 함께 대박 아니면 쪽박 능력을 사용합니다.\n");
+                    .append("과(와) 함께 대박 아니면 쪽박 능력이 적용됩니다.\n");
             if (new Random().nextBoolean()) {
                 result.append("\n").append(name).append("은(는) 죽음의 도박에서 살아남았습니다.\n")
                         .append(target.getName()).append("은(는) 사망하였습니다.\n");
@@ -39,20 +39,10 @@ public class Character7 extends CharacterTemplate {
     }
 
     @Override
-    public String useAbility() { // 추후 능력에 맞게 코드 수정 필요
+    public String useAbility() {
         StringBuilder result = new StringBuilder();
-
-        if (health <= 0) {
-            result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
-            return result.toString();
-        }
-        if (isAbilityUsed) {
-            result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
-            return result.toString();
-        }
-        isReady = true;
         setAbilityUsed(true);
-        result.append(name).append("은(는) 대박 아니면 쪽박 능력을 준비했습니다.\n");
+        result.append(name).append("은(는) 대박 아니면 쪽박 능력을 사용할 준비가 되었습니다.\n");
         return result.toString();
     }
 
@@ -61,7 +51,7 @@ public class Character7 extends CharacterTemplate {
         StringBuilder result = new StringBuilder();
         isAbilityUsed = false;
         isReady = false;
-        result.append(name).append("의 라운드 상태가 초기화되었습니다.\n");
+        result.append(name).append("의 능력 사용 가능 상태가 초기화되었습니다.\n");
         return result.toString();
     }
 }

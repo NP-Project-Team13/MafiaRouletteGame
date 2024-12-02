@@ -1,4 +1,5 @@
-// 1. 총알 위치를 확인하는 능력
+// 1. 총알 위치를 확인하는 능력 (매 라운드마다 능력 사용 여부 초기화)
+// todo 수정 필요
 package characters;
 
 public class Character1 extends CharacterTemplate {
@@ -7,7 +8,7 @@ public class Character1 extends CharacterTemplate {
         super(name, team, "총알 위치를 확인하는 능력");
     }
 
-    // 외부에서 총알 위치 확인 로직 구현 필요
+    // todo 외부에서 총알 위치 확인 로직 구현 필요
     @Override
     public String useAbility() {
         StringBuilder result = new StringBuilder();
@@ -29,7 +30,7 @@ public class Character1 extends CharacterTemplate {
     public String resetRound() {
         StringBuilder result = new StringBuilder();
         isAbilityUsed = false;
-        result.append(name).append("의 능력 사용 상태가 초기화되었습니다.\n");
+        result.append(name).append("의 능력 사용 가능 상태가 초기화되었습니다.\n");
         return result.toString();
     }
 }

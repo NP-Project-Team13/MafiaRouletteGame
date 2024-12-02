@@ -1,4 +1,5 @@
-// 2. 총알을 튕겨내는 방어 능력
+// 2. 총알을 튕겨내는 방어 능력 (매 라운드마다 능력 사용 여부 초기화)
+// todo 구현 완료
 package characters;
 
 public class Character2 extends CharacterTemplate {
@@ -46,7 +47,7 @@ public class Character2 extends CharacterTemplate {
         StringBuilder result = new StringBuilder();
         isAbilityUsed = false;
         deflectReady = false;
-        result.append(name).append("의 상태가 초기화되었습니다.\n");
+        result.append(name).append("의 능력 사용 가능 상태가 초기화되었습니다.\n");
         return result.toString();
     }
 }
