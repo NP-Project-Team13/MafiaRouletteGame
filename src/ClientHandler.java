@@ -8,9 +8,10 @@ public class ClientHandler implements Runnable {
     private MafiaServer server;
     private PrintWriter out;
     private BufferedReader in;
-    private String nickname;
     private CharacterTemplate character;
+    private String nickname;
     private String teams;
+    private boolean ready;
 
     public ClientHandler(Socket socket, MafiaServer server) {
         this.socket = socket;
@@ -28,18 +29,35 @@ public class ClientHandler implements Runnable {
         try {
             // 닉네임 수신
             System.out.println("클라이언트에서 닉네임을 기다리는 중...");
-            this.nickname = in.readLine(); // 닉네임 수신
-            System.out.println("닉네임 입력 완료: " + this.nickname); // 디버깅용 로그
+            setNickname(in.readLine()); // 닉네임 수신
+            System.out.println("닉네임 입력 완료: " + getNickname()); // 디버깅용 로그
 
             // 클라이언트에 대기 메시지 전송
-            sendMessage("게임 대기 중...");
+//            sendMessage("게임 대기 중...");
+            handleReq();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean isNicknameSet() {
-        return nickname != null && !nickname.trim().isEmpty();
+    public void setReady() {
+        this.ready = true;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void handleReq() {
+        try {
+            String actionJson = in.readLine();
+            ClientAction action = JsonUtil.jsonToAction(actionJson);
+            if (action.getAction().equals("ready")) { // 준비 상태 처리
+                setReady();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startTurn() {
@@ -98,7 +116,11 @@ public class ClientHandler implements Runnable {
     }
 
     public String getNickname() {
-        return nickname;
+        return this.nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public CharacterTemplate getCharacter() {
@@ -110,7 +132,11 @@ public class ClientHandler implements Runnable {
     }
 
     public void setTeam(String team) {
-        this.teams = team;
+        this.character.setTeam(team);
+    }
+
+    public String getTeam() {
+        return character.getTeam();
     }
 }
 

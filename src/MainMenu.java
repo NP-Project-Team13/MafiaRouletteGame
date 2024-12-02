@@ -62,6 +62,7 @@ public class MainMenu {
         startButton.addActionListener(e -> {
             frame.dispose();
             gameUI.createAndShowGUI();
+            client.sendReady();
         });
 
         rulesButton.addActionListener(e -> JOptionPane.showMessageDialog(frame,
