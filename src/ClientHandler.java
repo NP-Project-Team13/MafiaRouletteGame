@@ -67,41 +67,20 @@ public class ClientHandler implements Runnable {
             ClientAction action = JsonUtil.jsonToAction(actionJson);
 
             if ("shoot".equalsIgnoreCase(action.getAction())) {
-                server.handleShoot(this, action.getTarget());
+                sendResponse(server.handleShoot(this, action.getTarget()));
             } else if ("useAbility".equalsIgnoreCase(action.getAction())) {
                 // 능력 사용 처리 추가 가능
-                handleUseAbility(action.getTarget());
+                sendResponse(server.handleUseAbility(this,action.getTarget()));
             }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // 능력 사용 처리
-    private void handleUseAbility(String targetNickname) {
-        try {
-            if (character == null) {
-                sendMessage("캐릭터가 설정되지 않았습니다.");
-                return;
-            }
 
-            // 타겟을 찾음
-            ClientHandler target = server.clients.stream()
-                    .filter(client -> client.getNickname().equals(targetNickname))
-                    .findFirst()
-                    .orElse(null);
-
-            if (target != null) {
-                character.useAbility(target.getCharacter());
-                sendMessage("능력을 사용했습니다: " + character.getInfo());
-            } else {
-                character.useAbility();
-                sendMessage("능력을 사용했습니다: " + character.getInfo());
-            }
-        } catch (Exception e) {
-            sendMessage("능력 사용에 실패했습니다: " + e.getMessage());
-        }
-    }
 
     public void sendMessage(String message) {
         sendResponse(new ServerResponse(message));
