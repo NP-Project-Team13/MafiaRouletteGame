@@ -6,7 +6,7 @@ import java.net.*;
 
 public class MafiaClient {
     private Socket socket;
-    private BufferedReader in;
+    private ObjectInputStream in;
     private PrintWriter out;
     private String nickname;
     private GameUI gameUI; // GameUI 인스턴스 추가
@@ -16,7 +16,8 @@ public class MafiaClient {
             this.nickname = nickname; // 닉네임 설정
             this.gameUI = new GameUI(this); // GameUI 인스턴스 초기화
             socket = new Socket(serverAddress, serverPort); // 서버 연결
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            in = new ObjectInputStream(socket.getInputStream());
+//            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
             // 닉네임 전송
@@ -34,20 +35,25 @@ public class MafiaClient {
         new Thread(() -> {
             try {
                 while (true) {
-                    String serverMessage = in.readLine();
-                    // 서버 메시지가 null이 아니고 빈 문자열이 아닐 경우에만 처리
-                    if (serverMessage != null && !serverMessage.trim().isEmpty()) {
-                        if (serverMessage.startsWith("{")) {
-                            ServerResponse response = JsonUtil.jsonToResponse(serverMessage);
-                            // 서버 응답에 따라 UI 업데이트
-                            gameUI.handleServerResponse(response);
-                        } else {
-                            // 서버 메시지를 gameLog에 출력
-                            gameUI.logMessage("서버: " + serverMessage);
-                        }
-                    }
+//                    String serverMessage = in.readLine();
+//                    // 서버 메시지가 null이 아니고 빈 문자열이 아닐 경우에만 처리
+//                    if (serverMessage != null && !serverMessage.trim().isEmpty()) {
+//                        if (serverMessage.startsWith("{")) {
+//                            ServerResponse response = JsonUtil.jsonToResponse(serverMessage);
+//                            // 서버 응답에 따라 UI 업데이트
+//                            gameUI.handleServerResponse(response);
+//                        } else {
+//                            // 서버 메시지를 gameLog에 출력
+//                            gameUI.logMessage("서버: " + serverMessage);
+//                        }
+//                    }
+                    ServerResponse response = (ServerResponse) in.readObject();
+                    if (!response.getAction().equals("message"))
+                        // 서버 응답에 따라 UI 업데이트
+                        gameUI.handleServerResponse(response);
+                    gameUI.logMessage(response.getMessage());
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 System.out.println("서버와의 연결이 끊어졌습니다.");
                 e.printStackTrace();
             }
