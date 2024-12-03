@@ -30,28 +30,30 @@ public class Character6 extends CharacterTemplate {
     @Override
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
-        if(!isReady){ // 공격 역할
-            if (health <= 0) {
-                result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
-                return result.toString();
-            }
-            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!");
-            result.append(target.receiveDamage());
-            return result.toString();
-        }else{ // 힐 역할
-            if (health <= 0) {
-                result.append(name).append("은(는) 이미 사망했기 때문에 살릴 수 없습니다.");
-                return result.toString();
-            }else if (health >= 2){
-                health--;
-                target.health++;
-                result.append(name).append("은(는) 자신의 생명을 1 소모하여 ")
-                        .append(target.getName()).append("을(를) 1 치유했습니다.\n");
-            } else {
-                result.append(name).append("은(는) 치유할 만큼 충분한 체력이 없습니다. (최소 2 이상의 체력 필요)\n");
-            }
+
+        if (health <= 0) {
+            result.append(name)
+                    .append("은(는) 이미 사망했기 때문에 ")
+                    .append(isReady ? "살릴 수 없습니다." : "총을 쏠 수 없습니다.");
             return result.toString();
         }
+
+        if (!isReady) { // 공격 역할
+            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n")
+                    .append(target.receiveDamage());
+        } else { // 힐 역할
+            if (health < 2) {
+                result.append(name).append("은(는) 치유할 만큼 충분한 체력이 없습니다. (최소 2 이상의 체력 필요)\n");
+            } else if (target.getHealth() < 3) {
+                health--;
+                target.health++;
+                result.append(name).append("은(는) 자신의 체력을 1 소모하여 ").append(target.getName()).append("을(를) 1 치유했습니다.\n");
+            } else {
+                result.append(name).append("은(는) 이미 체력이 최대이기 때문에 치유할 수 없습니다.");
+            }
+        }
+
+        return result.toString();
     }
 
     @Override
