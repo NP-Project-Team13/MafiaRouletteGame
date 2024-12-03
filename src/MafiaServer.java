@@ -128,8 +128,7 @@ public class MafiaServer {
         int currentPlayerIndex = currentTurnIndex;
         int roundNumber = currentRound;
 
-        clients.forEach(client -> sendResponse(client,
-                new ServerResponse("updateGameState", "게임 상태 업데이트", characters, chambers, roundNumber, currentPlayerIndex)));
+        clients.forEach(client -> client.sendResponse(new ServerResponse("updateGameState", "게임 상태 업데이트", characters, chambers, roundNumber, currentPlayerIndex)));
     }
 
 
@@ -140,7 +139,7 @@ public class MafiaServer {
                 .orElse(null);
 
         if (target == null) {
-            sendResponse(shooter, new ServerResponse("shoot", "타겟 플레이어를 찾을 수 없습니다.", null, null, 0, 0));
+            shooter.sendResponse(new ServerResponse("shoot", "타겟 플레이어를 찾을 수 없습니다.", null, null, 0, 0));
             return;
         }
 
@@ -152,10 +151,10 @@ public class MafiaServer {
             targetHealth--;
         }
 
-        sendResponse(shooter, new ServerResponse("shoot", hit ? targetNickname + "에게 데미지를 입혔습니다." : targetNickname + "을(를) 빗맞췄습니다.", null, null, 0, 0));
+        shooter.sendResponse(new ServerResponse("shoot", hit ? targetNickname + "에게 데미지를 입혔습니다." : targetNickname + "을(를) 빗맞췄습니다.", null, null, 0, 0));
 
         if (hit) {
-            sendResponse(shooter, new ServerResponse("shoot", shooter.getNickname() + "에게 총을 맞았습니다. 체력이 1 감소합니다.", null, null, 0, 0));
+            shooter.sendResponse(new ServerResponse("shoot", shooter.getNickname() + "에게 총을 맞았습니다. 체력이 1 감소합니다.", null, null, 0, 0));
 
         }
 
@@ -164,10 +163,6 @@ public class MafiaServer {
         if (!target.getCharacter().isAlive()) {
             broadcast(targetNickname + "은(는) 사망했습니다.");
         }
-    }
-
-    private void sendResponse(ClientHandler client, ServerResponse response) {
-        client.sendMessage(JsonUtil.responseToJson(response));
     }
 
     private void broadcast(String message) {

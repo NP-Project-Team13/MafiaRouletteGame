@@ -6,7 +6,7 @@ import characters.CharacterTemplate;
 public class ClientHandler implements Runnable {
     private Socket socket;
     private MafiaServer server;
-    private PrintWriter out;
+    private ObjectOutputStream out;
     private BufferedReader in;
     private CharacterTemplate character;
     private String nickname;
@@ -17,9 +17,9 @@ public class ClientHandler implements Runnable {
         this.socket = socket;
         this.server = server;
         try {
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new ObjectOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
+        } catch (IOException e) { 
             e.printStackTrace();
         }
     }
@@ -104,9 +104,16 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendMessage(String message) {
-        out.println(message);
+        sendResponse(new ServerResponse(message));
     }
 
+    protected void sendResponse(ServerResponse response) {
+        try {
+            out.writeObject(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void closeConnection() {
         try {
             socket.close();
