@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameUI {
     private JTextArea gameLog;
@@ -84,6 +85,7 @@ public class GameUI {
                 playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
                 playerPanel.setBorder(BorderFactory.createTitledBorder(character.getName()));
 
+
                 JLabel playerInfo = new JLabel(
                         String.format(" [팀] %s [체력] %d [능력] %s",
                                 character.getTeam(),
@@ -92,14 +94,17 @@ public class GameUI {
                 );
                 playerPanel.add(playerInfo);
 
-                JButton shootButton = new JButton("Shoot");
-                shootButton.addActionListener(e -> shoot(character));
+                if (characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())) {
+                    JButton shootButton = new JButton("Shoot");
+                    shootButton.addActionListener(e -> shoot(character));
+                    playerPanel.add(shootButton);
+                }
+                if (character.getName().equals(client.getNickname())) {
+                    JButton abilityButton = new JButton("Use Ability");
+                    abilityButton.addActionListener(e -> useAbility(character));
+                    playerPanel.add(abilityButton);
+                }
 
-                JButton abilityButton = new JButton("Use Ability");
-                abilityButton.addActionListener(e -> useAbility(character));
-
-                playerPanel.add(shootButton);
-                playerPanel.add(abilityButton);
                 playerInfoPanel.add(playerPanel);
             }
         }
@@ -176,11 +181,9 @@ public class GameUI {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> logMessage(response.getMessage());
             case "shoot" -> {
-//                updateGameState(response);
                 logMessage(response.getMessage());
             }
             case "useAbility" -> {
-//                updateGameState(response);
                 logMessage(response.getMessage());
             }
 
@@ -193,19 +196,14 @@ public class GameUI {
 
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
-        for (CharacterTemplate character : response.getCharacters()) {
+        for (CharacterTemplate character : characters) {
             logMessage(" - 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
         }
 
         // 총알 슬롯 상태 업데이트
         bulletPositions = response.getChambers();
-        StringBuilder chamberStatus = new StringBuilder("총알 슬롯 상태: ");
-        chamberStatus.append("슬롯 ");
-        for (int i = 0; i < response.getChambers().size(); i++) {
-            chamberStatus.append(" ")
-                    .append(response.getChambers().get(i) ? "O " : "X ");
-        }
-        logMessage(chamberStatus.toString());
+        String chamberStatus = bulletPositions.stream().map(bulletPosition -> " " + (bulletPosition ? "O " : "X ")).collect(Collectors.joining("", "총알 슬롯 상태: " + "슬롯 ", ""));
+        logMessage(chamberStatus);
 
         // 현재 턴과 라운드 번호 업데이트
         currentPlayerIndex = response.getCurrentPlayerIndex();
