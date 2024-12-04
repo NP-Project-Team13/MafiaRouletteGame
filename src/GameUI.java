@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameUI {
+    private JFrame frame;
     private JTextArea gameLog;
     private JLabel turnLabel;
     private JPanel playerInfoPanel;
@@ -24,7 +25,7 @@ public class GameUI {
     }
 
     public void createAndShowGUI() {
-        JFrame frame = new JFrame("Mafia Roulette - Game Screen");
+        frame = new JFrame("Mafia Roulette - Game Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 1000);
 
@@ -185,6 +186,10 @@ public class GameUI {
             }
             case "useAbility" -> {
                 logMessage(response.getMessage());
+            }
+            case "end" -> {
+                frame.dispose(); // 현재 창 닫기
+                MainMenu.createAndShowGUI(client, client.getGameUI()); // 메인 메뉴 화면으로 돌아가기
             }
 
             // 추가적인 응답 처리 로직

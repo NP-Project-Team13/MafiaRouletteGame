@@ -169,6 +169,12 @@ public class MafiaServer {
 
         if (hit) {
             target.getCharacter().receiveDamage();
+
+//                for (ClientHandler ch :
+//                        clients) {
+//                    System.out.print(ch.getCharacter().getHealth()+" ");
+//                }
+//            System.out.println();
         }
 
         return new ServerResponse("shoot",
@@ -221,7 +227,7 @@ public class MafiaServer {
         broadcast(winner + "이(가) 승리했습니다!");
 
         for (ClientHandler client : clients) {
-            // todo ui 종료 후에 mainmenu 출력
+            client.sendResponse(new ServerResponse()); // client에 end response 전달
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
         }
