@@ -147,7 +147,7 @@ public class MafiaServer {
         }
 
         try {
-            character.useAbility(target != null ? target.getCharacter() : null);
+            character.useAbility(/*target != null ? target.getCharacter() : null*/); // useAbility에는 argument가 존재하지 않음
             return new ServerResponse("useAbility", user.getNickname() + "이(가) 능력을 사용했습니다.", collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
         } catch (Exception e) {
             return new ServerResponse("error", "능력 사용 중 오류 발생: " + e.getMessage(), null, null, currentRound, currentTurnIndex);
