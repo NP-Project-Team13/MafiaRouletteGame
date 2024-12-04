@@ -131,39 +131,57 @@ public class MafiaServer {
         clients.forEach(client -> client.sendResponse(new ServerResponse("updateGameState", "게임 상태 업데이트", characters, chambers, roundNumber, currentPlayerIndex)));
     }
 
+    public ServerResponse handleUseAbility(ClientHandler user, String targetNickname) {
+        CharacterTemplate character = user.getCharacter();
+        if (character == null) {
+            return new ServerResponse("error", "캐릭터가 설정되지 않았습니다.", null, null, currentRound, currentTurnIndex);
+        }
 
-    public void handleShoot(ClientHandler shooter, String targetNickname) {
+        ClientHandler target = clients.stream()
+                .filter(client -> client.getNickname().equals(targetNickname))
+                .findFirst()
+                .orElse(null);
+
+        if (target == null && character.getInfo().contains("대상 필요")) {
+            return new ServerResponse("error", "타겟 플레이어를 찾을 수 없습니다.", null, null, currentRound, currentTurnIndex);
+        }
+
+        try {
+            character.useAbility(target != null ? target.getCharacter() : null);
+            return new ServerResponse("useAbility", user.getNickname() + "이(가) 능력을 사용했습니다.", collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+        } catch (Exception e) {
+            return new ServerResponse("error", "능력 사용 중 오류 발생: " + e.getMessage(), null, null, currentRound, currentTurnIndex);
+        }
+    }
+
+
+    public ServerResponse handleShoot(ClientHandler shooter, String targetNickname) {
         ClientHandler target = clients.stream()
                 .filter(client -> client.getNickname().equals(targetNickname))
                 .findFirst()
                 .orElse(null);
 
         if (target == null) {
-            shooter.sendResponse(new ServerResponse("shoot", "타겟 플레이어를 찾을 수 없습니다.", null, null, 0, 0));
-            return;
+            return new ServerResponse("error", "타겟 플레이어를 찾을 수 없습니다.", null, null, currentRound, currentTurnIndex);
         }
 
         boolean hit = gun.fire();
-        int targetHealth = target.getCharacter().getHealth();
 
         if (hit) {
             target.getCharacter().receiveDamage();
-            targetHealth--;
         }
 
-        shooter.sendResponse(new ServerResponse("shoot", hit ? targetNickname + "에게 데미지를 입혔습니다." : targetNickname + "을(를) 빗맞췄습니다.", null, null, 0, 0));
-
-        if (hit) {
-            shooter.sendResponse(new ServerResponse("shoot", shooter.getNickname() + "에게 총을 맞았습니다. 체력이 1 감소합니다.", null, null, 0, 0));
-
-        }
-
-        broadcast(shooter.getNickname() + "이(가) " + targetNickname + "을(를) " + (hit ? "적중시켰습니다!" : "빗맞췄습니다!"));
-
-        if (!target.getCharacter().isAlive()) {
-            broadcast(targetNickname + "은(는) 사망했습니다.");
-        }
+        return new ServerResponse("shoot",
+                shooter.getNickname() + "이(가) " + (hit ? targetNickname + "을(를) 적중시켰습니다." : "빗맞췄습니다."),
+                collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
     }
+
+    private List<CharacterTemplate> collectCharacters() {
+        return clients.stream()
+                .map(ClientHandler::getCharacter)
+                .collect(Collectors.toList());
+    }
+
 
     private void broadcast(String message) {
         for (ClientHandler client : clients) {
