@@ -75,7 +75,6 @@ public class GameUI {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
         if (characters.isEmpty()) {
@@ -85,37 +84,49 @@ public class GameUI {
         } else {
             for (CharacterTemplate character : characters) {
                 JPanel playerPanel = new JPanel();
-                playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
+                playerPanel.setLayout(new GridBagLayout()); // GridBagLayout 사용
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.fill = GridBagConstraints.HORIZONTAL; // 수평 방향으로 꽉 채우기
+                gbc.weightx = 1.0; // 가중치 설정
+
                 // TitledBorder 생성 및 속성 설정
                 TitledBorder border = BorderFactory.createTitledBorder(character.getName());
                 border.setTitleColor(Color.WHITE); // 제목 글씨 색상 설정
                 border.setTitleFont(new Font("Serif", Font.BOLD, 16)); // 제목 글씨 크기 설정
                 playerPanel.setBorder(border);
-                playerPanel.setPreferredSize(new Dimension(250, 200)); // 일관된 크기 설정
+                playerPanel.setPreferredSize(new Dimension(250, 150)); // 일관된 크기 설정
 
-                JLabel playerInfo1 = new JLabel(
-                        String.format(" Team:" + character.getTeam())
-                );
-
-                JLabel playerInfo2 = new JLabel(
-                        String.format(" Life: " +
-                                character.getHealth())
-                );
-
-                // 테스트용, 최종적으로 삭제할 내용
-                JLabel playerInfo3 = new JLabel(
-                        String.format(" [능력] " +
-                                character.getInfo())
-                );
+                JLabel playerInfo1 = new JLabel(String.format(" Team: %s", character.getTeam()));
                 playerInfo1.setForeground(Color.WHITE); // 글씨 색상 흰색
-                playerInfo2.setForeground(Color.WHITE);
-                playerInfo3.setForeground(Color.WHITE);
                 playerInfo1.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
-                playerInfo2.setFont(new Font("Serif", Font.BOLD, 16));
-                playerInfo3.setFont(new Font("Serif", Font.BOLD, 16));
-                playerPanel.add(playerInfo1);
-                playerPanel.add(playerInfo2);
-                playerPanel.add(playerInfo3);
+
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                playerPanel.add(playerInfo1, gbc); // 팀 정보 추가
+
+                // Life 정보를 하트 아이콘으로 표시
+                JPanel lifePanel = new JPanel();
+                lifePanel.setOpaque(false); // 투명하게 설정
+                int health = character.getHealth();
+                for (int i = 0; i < health; i++) {
+                    ImageIcon heartIcon = new ImageIcon(getClass().getResource("/resources/heart.png"));
+                    Image heartImage = heartIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH); // 크기 조정
+                    JLabel heartLabel = new JLabel(new ImageIcon(heartImage));
+                    lifePanel.add(heartLabel);
+                }
+
+                gbc.gridx = 0;
+                gbc.gridy = 1;
+                playerPanel.add(lifePanel, gbc); // 하트 아이콘 추가
+
+                // 능력 정보
+                JLabel playerInfo2 = new JLabel(String.format(" [능력] %s", character.getInfo()));
+                playerInfo2.setForeground(Color.WHITE); // 글씨 색상 흰색
+                playerInfo2.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
+
+                gbc.gridx = 0;
+                gbc.gridy = 2;
+                playerPanel.add(playerInfo2, gbc); // 능력 정보 추가
 
                 // 생존 여부에 따라 패널의 색상 조정 및 버튼 생성
                 if (!character.isAlive()) {
@@ -123,23 +134,24 @@ public class GameUI {
                 } else {
                     playerPanel.setBackground(new Color(60, 60, 60));
 
-                    // 항상 Shoot 버튼 생성, 상태에 따라 disabled 설정
+                    // Shoot 버튼 생성
                     JButton shootButton = new JButton("Shoot");
                     shootButton.setBackground(new Color(100, 100, 100));
                     shootButton.setForeground(Color.WHITE);
                     shootButton.setEnabled(characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())); // 상태에 따라 활성화 또는 비활성화
-                    shootButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // 버튼 크기 설정
-                    shootButton.addActionListener(e -> shoot(character));
-                    playerPanel.add(shootButton);
+                    gbc.gridx = 0;
+                    gbc.gridy = 3;
+                    gbc.weighty = 1.0; // 버튼이 패널을 꽉 채우도록 가중치 설정
+                    playerPanel.add(shootButton, gbc); // Shoot 버튼 추가
 
-                    // 본인 Character의 useAbility 버튼 생성
+                    // Use Ability 버튼 생성
                     if (character.getName().equals(client.getNickname())) {
                         JButton abilityButton = new JButton("Use Ability");
                         abilityButton.setBackground(new Color(100, 100, 100));
                         abilityButton.setForeground(Color.WHITE);
-                        abilityButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // 버튼 크기 설정
-                        abilityButton.addActionListener(e -> useAbility(character));
-                        playerPanel.add(abilityButton);
+                        gbc.gridx = 0;
+                        gbc.gridy = 4;
+                        playerPanel.add(abilityButton, gbc); // Use Ability 버튼 추가
                     }
                 }
 
@@ -153,7 +165,6 @@ public class GameUI {
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
     }
-
     private void shoot(CharacterTemplate currentCharacter) {
         CharacterTemplate target = selectTarget("타겟을 선택하세요");
         if (target == null) return;
