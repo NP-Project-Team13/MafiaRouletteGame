@@ -98,13 +98,13 @@ public class GameUI {
                 );
 
                 JLabel playerInfo2 = new JLabel(
-                        String.format("Life: " +
+                        String.format(" Life: " +
                                 character.getHealth())
                 );
 
                 // 테스트용, 최종적으로 삭제할 내용
                 JLabel playerInfo3 = new JLabel(
-                        String.format("[능력] " +
+                        String.format(" [능력] " +
                                 character.getInfo())
                 );
                 playerInfo1.setForeground(Color.WHITE); // 글씨 색상 흰색
@@ -128,6 +128,7 @@ public class GameUI {
                     shootButton.setBackground(new Color(100, 100, 100));
                     shootButton.setForeground(Color.WHITE);
                     shootButton.setEnabled(characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())); // 상태에 따라 활성화 또는 비활성화
+                    shootButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // 버튼 크기 설정
                     shootButton.addActionListener(e -> shoot(character));
                     playerPanel.add(shootButton);
 
@@ -136,6 +137,7 @@ public class GameUI {
                         JButton abilityButton = new JButton("Use Ability");
                         abilityButton.setBackground(new Color(100, 100, 100));
                         abilityButton.setForeground(Color.WHITE);
+                        abilityButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // 버튼 크기 설정
                         abilityButton.addActionListener(e -> useAbility(character));
                         playerPanel.add(abilityButton);
                     }
