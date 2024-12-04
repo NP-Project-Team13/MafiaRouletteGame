@@ -11,6 +11,7 @@ public class ServerResponse implements Serializable {
     private int roundNumber; // 현재 라운드 번호
     private int currentPlayerIndex; // 현재 플레이어 인덱스
 
+
     // shoot 관련 Response
     public ServerResponse(String action, String message, List<CharacterTemplate> characters,
                           List<Boolean> chambers, int roundNumber, int currentPlayerIndex) {
