@@ -13,15 +13,13 @@ public class GameUI {
     private List<CharacterTemplate> characters; // Character0 리스트로 변경
     private int currentPlayerIndex;
     private int roundNumber = 1;
-    private static final int CYLINDER_SIZE = 5;
     private List<Boolean> bulletPositions;
-    private int turnCounter = 0;
     private int currentSlot = 1;
 
     public GameUI(MafiaClient client) {
         this.client = client; // 클라이언트 인스턴스 초기화
         this.characters = new ArrayList<>();
-        initializeCharacters(); // 캐릭터 초기화
+        this.bulletPositions = new ArrayList<>();
     }
 
     public void createAndShowGUI() {
@@ -40,7 +38,6 @@ public class GameUI {
         backButton.setFont(new Font("Serif", Font.BOLD, 16));
         backButton.addActionListener(e -> goBack(frame));
 
-//        turnLabel = new JLabel("현재 턴: " + characters.get(currentPlayerIndex).getName() + " | 라운드: " + roundNumber, SwingConstants.CENTER);
         turnLabel = new JLabel("게임 대기중", SwingConstants.CENTER);
         turnLabel.setFont(new Font("Serif", Font.BOLD, 28));
         turnLabel.setForeground(Color.RED);
@@ -63,7 +60,6 @@ public class GameUI {
         playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.Y_AXIS));
         playerInfoPanel.setOpaque(false);
 
-//        initializeBullets();
         updatePlayerInfoPanel();
 
         frame.setLayout(new BorderLayout());
@@ -74,42 +70,6 @@ public class GameUI {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-//        logMessage("게임이 시작되었습니다. " + characters.get(currentPlayerIndex).getName() + "의 턴입니다.");
-    }
-
-    private void initializeCharacters() {
-        // 서버에서 캐릭터 정보 받아오기
-//        for (int i = 0; i < 8; i++) {
-//            characters.add(new Character1("name" + (i + 1), "Team A")); // 예시로 Character1 사용
-//        }
-//        currentPlayerIndex = 0;
-    }
-
-    private void initializeBullets() {
-        // 서버로부터 bullet 정보 받아오기
-//        bulletPositions = new boolean[CYLINDER_SIZE];
-//        Random random = new Random();
-//        int bulletsInRound = Math.min(roundNumber, CYLINDER_SIZE);
-//
-//        for (int i = 0; i < bulletsInRound; i++) {
-//            int position;
-//            do {
-//                position = random.nextInt(CYLINDER_SIZE);
-//            } while (bulletPositions[position]);
-//            bulletPositions[position] = true;
-//        }
-//
-//        logMessage("라운드 " + roundNumber + " 시작! 총알이 장전된 슬롯: "/* + getBulletPositionsString()*/);
-    }
-
-    private String getBulletPositionsString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bulletPositions.size(); i++) {
-            if (bulletPositions.get(i)) {
-                sb.append(i + 1).append(" ");
-            }
-        }
-        return sb.toString().trim();
     }
 
     private void updatePlayerInfoPanel() {
@@ -144,31 +104,10 @@ public class GameUI {
             }
         }
 
-//        JLabel bulletLabel = new JLabel(" [총알 슬롯] " + getBulletPositionsString());
-//        playerInfoPanel.add(bulletLabel);
         JLabel bulletLabel2 = new JLabel(" [현재 슬롯] " + (currentSlot));
         playerInfoPanel.add(bulletLabel2);
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
-    }
-
-    private void nextTurn() {
-        do {
-            currentPlayerIndex = (currentPlayerIndex + 1) % characters.size();
-        } while (!characters.get(currentPlayerIndex).isAlive());
-
-        turnCounter++;
-
-        if (turnCounter >= alivePlayerCount()) {
-            logMessage("모든 플레이어가 턴을 완료했습니다. 라운드 " + roundNumber + " 종료!");
-            roundNumber++;
-            resetCharacterAbilities();
-            turnCounter = 0;
-        }
-
-        updateTurnLabel();
-        logMessage("▶ " + characters.get(currentPlayerIndex).getName() + "의 턴입니다.");
-        updatePlayerInfoPanel();
     }
 
     private void shoot(CharacterTemplate currentCharacter) {
@@ -180,22 +119,6 @@ public class GameUI {
         // 서버에 총 쏘기 요청 전송
         client.sendShootRequest(currentCharacter, target, currentSlot);
 
-        // 슬롯 증가
-//        currentSlot = (currentSlot % CYLINDER_SIZE) + 1;
-
-//        if (!anyBulletsLeft()) {
-//            logMessage("모든 총알이 소모되었습니다. 총알 재장전 중...");
-//            initializeBullets(); // 총알 재장전
-//        }
-
-        nextTurn();
-    }
-
-    private boolean anyBulletsLeft() {
-        for (boolean bullet : bulletPositions) {
-            if (bullet) return true;
-        }
-        return false;
     }
 
     private void useAbility(CharacterTemplate currentCharacter) {
@@ -204,21 +127,10 @@ public class GameUI {
             return;
         }
 
-//        // 타겟 선택을 위한 입력 받기
-//        String targetNickname = JOptionPane.showInputDialog("능력을 사용할 타겟의 닉네임을 입력하세요:");
-//        if (targetNickname == null || targetNickname.trim().isEmpty()) {
-//            logMessage("타겟이 선택되지 않았습니다.");
-//            return;
-//        }
-
-//        // 서버에 능력 사용 요청 전송
-//        client.sendAbilityRequest(currentCharacter, targetNickname);
-
         // 서버에 능력 사용 요청 전송
         client.sendAbilityRequest(currentCharacter);
 
         logMessage(currentCharacter.getName() + "이(가) 능력을 사용했습니다.");
-        updatePlayerInfoPanel();
     }
 
     private void updateTurnLabel() {
@@ -235,14 +147,6 @@ public class GameUI {
                 characters.toArray(),
                 characters.get(0) // 기본 선택
         );
-    }
-
-    private void resetCharacterAbilities() {
-        for (CharacterTemplate character : characters) {
-            if (character.isAlive()) {
-                character.resetAbilityUsage();
-            }
-        }
     }
 
     public void logMessage(String message) {
@@ -265,16 +169,6 @@ public class GameUI {
     }
 
 
-    private int alivePlayerCount() {
-        int count = 0;
-        for (CharacterTemplate character : characters) {
-            if (character.isAlive()) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     // 서버 응답 처리 메소드 추가
     public void handleServerResponse(ServerResponse response) {
         // 서버 응답에 따라 UI 업데이트 로직 추가
@@ -282,18 +176,17 @@ public class GameUI {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> logMessage(response.getMessage());
             case "shoot" -> {
-                updateGameState(response);
+//                updateGameState(response);
                 logMessage(response.getMessage());
             }
             case "useAbility" -> {
-                updateGameState(response);
+//                updateGameState(response);
                 logMessage(response.getMessage());
             }
 
             // 추가적인 응답 처리 로직
             default -> logMessage("알 수 없는 행동: " + response.getAction());
         }
-        updatePlayerInfoPanel(); // UI 업데이트
     }
 
     private void updateGameState(ServerResponse response) {
@@ -307,9 +200,10 @@ public class GameUI {
         // 총알 슬롯 상태 업데이트
         bulletPositions = response.getChambers();
         StringBuilder chamberStatus = new StringBuilder("총알 슬롯 상태: ");
+        chamberStatus.append("슬롯 ");
         for (int i = 0; i < response.getChambers().size(); i++) {
-            chamberStatus.append("슬롯 ").append(i + 1).append(": ")
-                    .append(response.getChambers().get(i) ? "O " : "X ").append(", ");
+            chamberStatus.append(" ")
+                    .append(response.getChambers().get(i) ? "O " : "X ");
         }
         logMessage(chamberStatus.toString());
 
