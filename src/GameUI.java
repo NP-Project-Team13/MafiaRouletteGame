@@ -188,7 +188,7 @@ public class GameUI {
 //            initializeBullets(); // 총알 재장전
 //        }
 
-//        nextTurn();
+        nextTurn();
     }
 
     private boolean anyBulletsLeft() {
