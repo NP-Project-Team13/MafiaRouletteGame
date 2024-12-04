@@ -279,19 +279,13 @@ public class GameUI {
     public void handleServerResponse(ServerResponse response) {
         // 서버 응답에 따라 UI 업데이트 로직 추가
         switch (response.getAction()) {
-            case "updateGameState":
-                updateGameState(response); // 게임 상태 업데이트 메소드 호출
-                break;
-            case "shoot":
-                logMessage(response.getMessage());
-                break;
-            case "useAbility":
-                logMessage(response.getMessage());
-                break;
+            case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
+            case "message" -> logMessage(response.getMessage());
+            case "shoot" -> logMessage(response.getMessage());
+            case "useAbility" -> logMessage(response.getMessage());
+
             // 추가적인 응답 처리 로직
-            default:
-                logMessage("알 수 없는 행동: " + response.getAction());
-                break;
+            default -> logMessage("알 수 없는 행동: " + response.getAction());
         }
         updatePlayerInfoPanel(); // UI 업데이트
     }
