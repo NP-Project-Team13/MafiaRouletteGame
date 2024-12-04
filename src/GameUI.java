@@ -1,9 +1,8 @@
-import characters.CharacterTemplate; // Character0로 변경
+import characters.CharacterTemplate;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,16 +29,18 @@ public class GameUI {
         frame = new JFrame("Mafia Roulette - Game Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 1000);
+        frame.getContentPane().setBackground(new Color(50, 50, 50));
 
         JPanel gameViewPanel = new JPanel(new BorderLayout());
-        gameViewPanel.setBackground(Color.DARK_GRAY);
+        gameViewPanel.setBackground(new Color(40, 40, 40));
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // 뒤로가기 버튼
         JButton backButton = new JButton("뒤로가기");
         backButton.setFont(new Font("Serif", Font.BOLD, 16));
+        backButton.setBackground(new Color(80, 80, 80));
+        backButton.setForeground(Color.WHITE);
         backButton.addActionListener(e -> goBack(frame));
 
         turnLabel = new JLabel("게임 대기중", SwingConstants.CENTER);
@@ -54,7 +55,7 @@ public class GameUI {
         gameLog.setEditable(false);
         gameLog.setLineWrap(true);
         gameLog.setWrapStyleWord(true);
-        gameLog.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        gameLog.setFont(new Font("Monospaced", Font.PLAIN, 16)); // 글씨 크기 증가
         gameLog.setBackground(new Color(30, 30, 30));
         gameLog.setForeground(Color.WHITE);
         JScrollPane logScrollPane = new JScrollPane(gameLog);
@@ -73,43 +74,68 @@ public class GameUI {
 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
     }
 
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
         if (characters.isEmpty()) {
-            // 임시 정보 표시
-            JLabel tempInfo = new JLabel("플레이어 정보가 아직 로드되지 않았습니다.");
+            JLabel tempInfo = new JLabel("플레이어 정보가 아직 로드되지 않았습니다.", SwingConstants.CENTER);
+            tempInfo.setForeground(Color.WHITE);
             playerInfoPanel.add(tempInfo);
         } else {
             for (CharacterTemplate character : characters) {
                 JPanel playerPanel = new JPanel();
                 playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
-                playerPanel.setBorder(BorderFactory.createTitledBorder(character.getName()));
+                // TitledBorder 생성 및 속성 설정
+                TitledBorder border = BorderFactory.createTitledBorder(character.getName());
+                border.setTitleColor(Color.WHITE); // 제목 글씨 색상 설정
+                border.setTitleFont(new Font("Serif", Font.BOLD, 16)); // 제목 글씨 크기 설정
+                playerPanel.setBorder(border);
+                playerPanel.setPreferredSize(new Dimension(250, 200)); // 일관된 크기 설정
 
+                JLabel playerInfo1 = new JLabel(
+                        String.format(" Team:" + character.getTeam())
+                );
 
-                JLabel playerInfo = new JLabel(
-                        String.format(" [팀] %s [체력] %d [능력] %s",
-                                character.getTeam(),
-                                character.getHealth(),
+                JLabel playerInfo2 = new JLabel(
+                        String.format("Life: " +
+                                character.getHealth())
+                );
+
+                // 테스트용, 최종적으로 삭제할 내용
+                JLabel playerInfo3 = new JLabel(
+                        String.format("[능력] " +
                                 character.getInfo())
                 );
-                playerPanel.add(playerInfo);
+                playerInfo1.setForeground(Color.WHITE); // 글씨 색상 흰색
+                playerInfo2.setForeground(Color.WHITE);
+                playerInfo3.setForeground(Color.WHITE);
+                playerInfo1.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
+                playerInfo2.setFont(new Font("Serif", Font.BOLD, 16));
+                playerInfo3.setFont(new Font("Serif", Font.BOLD, 16));
+                playerPanel.add(playerInfo1);
+                playerPanel.add(playerInfo2);
+                playerPanel.add(playerInfo3);
 
                 // 생존 여부에 따라 패널의 색상 조정 및 버튼 생성
                 if (!character.isAlive()) {
                     playerPanel.setBackground(new Color(255, 0, 0, 120));
-                }else {
-                    // 턴의 여부에 따라 Shoot 버튼 생성
-                    if (characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())) {
-                        JButton shootButton = new JButton("Shoot");
-                        shootButton.addActionListener(e -> shoot(character));
-                        playerPanel.add(shootButton);
-                    }
+                } else {
+                    playerPanel.setBackground(new Color(60, 60, 60));
+
+                    // 항상 Shoot 버튼 생성, 상태에 따라 disabled 설정
+                    JButton shootButton = new JButton("Shoot");
+                    shootButton.setBackground(new Color(100, 100, 100));
+                    shootButton.setForeground(Color.WHITE);
+                    shootButton.setEnabled(characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())); // 상태에 따라 활성화 또는 비활성화
+                    shootButton.addActionListener(e -> shoot(character));
+                    playerPanel.add(shootButton);
+
                     // 본인 Character의 useAbility 버튼 생성
                     if (character.getName().equals(client.getNickname())) {
                         JButton abilityButton = new JButton("Use Ability");
+                        abilityButton.setBackground(new Color(100, 100, 100));
+                        abilityButton.setForeground(Color.WHITE);
                         abilityButton.addActionListener(e -> useAbility(character));
                         playerPanel.add(abilityButton);
                     }
@@ -120,6 +146,7 @@ public class GameUI {
         }
 
         JLabel bulletLabel2 = new JLabel(" [현재 슬롯] " + (currentSlot));
+        bulletLabel2.setForeground(Color.WHITE); // 총알 슬롯 레이블 색상 설정
         playerInfoPanel.add(bulletLabel2);
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
@@ -133,7 +160,6 @@ public class GameUI {
 
         // 서버에 총 쏘기 요청 전송
         client.sendShootRequest(currentCharacter, target, currentSlot);
-
     }
 
     private void useAbility(CharacterTemplate currentCharacter) {
@@ -189,7 +215,6 @@ public class GameUI {
         }
     }
 
-
     // 서버 응답 처리 메소드 추가
     public void handleServerResponse(ServerResponse response) {
         // 서버 응답에 따라 UI 업데이트 로직 추가
@@ -213,7 +238,6 @@ public class GameUI {
     }
 
     private void updateGameState(ServerResponse response) {
-
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
         for (CharacterTemplate character : characters) {
@@ -222,7 +246,9 @@ public class GameUI {
 
         // 총알 슬롯 상태 업데이트
         bulletPositions = response.getChambers();
-        String chamberStatus = bulletPositions.stream().map(bulletPosition -> " " + (bulletPosition ? "O " : "X ")).collect(Collectors.joining("", "총알 슬롯 상태: " + "슬롯 ", ""));
+        String chamberStatus = bulletPositions.stream()
+                .map(bulletPosition -> " " + (bulletPosition ? "O " : "X "))
+                .collect(Collectors.joining("", "총알 슬롯 상태: " + "슬롯 ", ""));
         logMessage(chamberStatus);
 
         // 현재 턴과 라운드 번호 업데이트
