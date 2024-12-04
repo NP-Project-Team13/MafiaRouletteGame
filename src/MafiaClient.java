@@ -41,6 +41,7 @@ public class MafiaClient {
                 while (true) {
                     ServerResponse response = (ServerResponse) in.readObject();
 
+                    // todo MafiaClient에서 response 받자마자 Characters의 health 확인
 //                    if (!response.getAction().equals("message")) {
 //                        System.out.println("받은 character");
 //                        for (CharacterTemplate ct:

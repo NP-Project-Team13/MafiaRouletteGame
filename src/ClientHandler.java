@@ -90,6 +90,7 @@ public class ClientHandler implements Runnable {
 
     protected void sendResponse(ServerResponse response) {
         try {
+            // todo ClientHandler에서 sendResponse 전에 Characters의 health 확인
 //            if (!response.getAction().equals("message")) {
 //                for (CharacterTemplate ct :
 //                        response.getCharacters()) {
