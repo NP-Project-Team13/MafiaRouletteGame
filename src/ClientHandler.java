@@ -3,6 +3,8 @@ import java.net.*;
 
 import characters.CharacterTemplate;
 
+import javax.swing.*;
+
 public class ClientHandler implements Runnable {
     private Socket socket;
     private MafiaServer server;

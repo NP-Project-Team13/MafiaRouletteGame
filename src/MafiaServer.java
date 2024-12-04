@@ -190,22 +190,38 @@ public class MafiaServer {
     }
 
     private boolean checkGameOver() {
-        long aliveCount = clients.stream()
-                .filter(client -> client.getCharacter().isAlive())
-                .count();
-        return aliveCount <= 1;
+        boolean isTeamAAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "A".equals(client.getCharacter().getTeam()));
+
+        boolean isTeamBAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "B".equals(client.getCharacter().getTeam()));
+
+        // A팀 또는 B팀 중 한 팀이 전멸하면 true 반환
+        return !(isTeamAAlive && isTeamBAlive);
     }
 
     private void endGame() {
         broadcast("게임이 종료되었습니다!");
-        String winner = clients.stream()
-                .filter(client -> client.getCharacter().isAlive())
-                .map(ClientHandler::getNickname)
-                .findFirst()
-                .orElse("없음");
+
+        boolean isTeamAAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "A".equals(client.getCharacter().getTeam()));
+
+        boolean isTeamBAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "B".equals(client.getCharacter().getTeam()));
+
+        String winner;
+        if (isTeamAAlive && !isTeamBAlive) {
+            winner = "A팀";
+        } else if (isTeamBAlive && !isTeamAAlive) {
+            winner = "B팀";
+        } else {
+            winner = "없음"; // 모든 팀이 전멸한 경우
+        }
+
         broadcast(winner + "이(가) 승리했습니다!");
 
         for (ClientHandler client : clients) {
+            // todo ui 종료 후에 mainmenu 출력
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
         }
