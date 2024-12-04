@@ -99,7 +99,7 @@ public class GameUI {
 //            bulletPositions[position] = true;
 //        }
 //
-        logMessage("라운드 " + roundNumber + " 시작! 총알이 장전된 슬롯: "/* + getBulletPositionsString()*/);
+//        logMessage("라운드 " + roundNumber + " 시작! 총알이 장전된 슬롯: "/* + getBulletPositionsString()*/);
     }
 
     private String getBulletPositionsString() {
@@ -181,12 +181,12 @@ public class GameUI {
         client.sendShootRequest(currentCharacter, target, currentSlot);
 
         // 슬롯 증가
-        currentSlot = (currentSlot % CYLINDER_SIZE) + 1;
+//        currentSlot = (currentSlot % CYLINDER_SIZE) + 1;
 
-        if (!anyBulletsLeft()) {
-            logMessage("모든 총알이 소모되었습니다. 총알 재장전 중...");
-            initializeBullets(); // 총알 재장전
-        }
+//        if (!anyBulletsLeft()) {
+//            logMessage("모든 총알이 소모되었습니다. 총알 재장전 중...");
+//            initializeBullets(); // 총알 재장전
+//        }
 
         nextTurn();
     }
@@ -279,25 +279,24 @@ public class GameUI {
     public void handleServerResponse(ServerResponse response) {
         // 서버 응답에 따라 UI 업데이트 로직 추가
         switch (response.getAction()) {
-            case "updateGameState":
-                updateGameState(response); // 게임 상태 업데이트 메소드 호출
-                break;
-            case "shoot":
+            case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
+            case "message" -> logMessage(response.getMessage());
+            case "shoot" -> {
+                updateGameState(response);
                 logMessage(response.getMessage());
-                break;
-            case "useAbility":
+            }
+            case "useAbility" -> {
+                updateGameState(response);
                 logMessage(response.getMessage());
-                break;
+            }
+
             // 추가적인 응답 처리 로직
-            default:
-                logMessage("알 수 없는 행동: " + response.getAction());
-                break;
+            default -> logMessage("알 수 없는 행동: " + response.getAction());
         }
         updatePlayerInfoPanel(); // UI 업데이트
     }
 
     private void updateGameState(ServerResponse response) {
-        logMessage(response.getMessage());
 
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
@@ -310,7 +309,7 @@ public class GameUI {
         StringBuilder chamberStatus = new StringBuilder("총알 슬롯 상태: ");
         for (int i = 0; i < response.getChambers().size(); i++) {
             chamberStatus.append("슬롯 ").append(i + 1).append(": ")
-                    .append(response.getChambers().get(i) ? "장전됨" : "비어있음").append(", ");
+                    .append(response.getChambers().get(i) ? "O " : "X ").append(", ");
         }
         logMessage(chamberStatus.toString());
 

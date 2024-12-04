@@ -48,10 +48,7 @@ public class MafiaClient {
 //                        }
 //                    }
                     ServerResponse response = (ServerResponse) in.readObject();
-                    if (!response.getAction().equals("message"))
-                        // 서버 응답에 따라 UI 업데이트
-                        gameUI.handleServerResponse(response);
-                    gameUI.logMessage(response.getMessage());
+                    gameUI.handleServerResponse(response);
                 }
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("서버와의 연결이 끊어졌습니다.");
