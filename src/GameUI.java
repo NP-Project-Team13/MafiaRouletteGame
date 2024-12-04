@@ -281,8 +281,14 @@ public class GameUI {
         switch (response.getAction()) {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> logMessage(response.getMessage());
-            case "shoot" -> logMessage(response.getMessage());
-            case "useAbility" -> logMessage(response.getMessage());
+            case "shoot" -> {
+                updateGameState(response);
+                logMessage(response.getMessage());
+            }
+            case "useAbility" -> {
+                updateGameState(response);
+                logMessage(response.getMessage());
+            }
 
             // 추가적인 응답 처리 로직
             default -> logMessage("알 수 없는 행동: " + response.getAction());
