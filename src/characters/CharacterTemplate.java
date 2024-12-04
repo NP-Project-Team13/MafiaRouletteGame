@@ -103,4 +103,8 @@ public abstract class CharacterTemplate implements Serializable {
         this.info = info;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
 }

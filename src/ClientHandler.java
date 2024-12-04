@@ -21,7 +21,7 @@ public class ClientHandler implements Runnable {
         try {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) { 
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -72,7 +72,7 @@ public class ClientHandler implements Runnable {
                 sendResponse(server.handleShoot(this, action.getTarget()));
             } else if ("useAbility".equalsIgnoreCase(action.getAction())) {
                 // 능력 사용 처리 추가 가능
-                sendResponse(server.handleUseAbility(this,action.getTarget()));
+                sendResponse(server.handleUseAbility(this, action.getTarget()));
             }
 
 
@@ -90,6 +90,12 @@ public class ClientHandler implements Runnable {
 
     protected void sendResponse(ServerResponse response) {
         try {
+//            if (!response.getAction().equals("message")) {
+//                for (CharacterTemplate ct :
+//                        response.getCharacters()) {
+//                    System.out.println(ct.getHealth());
+//                }
+//            }
             out.writeObject(response);
         } catch (IOException e) {
             throw new RuntimeException(e);

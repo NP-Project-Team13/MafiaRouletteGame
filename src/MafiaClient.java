@@ -30,11 +30,25 @@ public class MafiaClient {
         }
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
+
     public void start() {
         new Thread(() -> {
             try {
                 while (true) {
                     ServerResponse response = (ServerResponse) in.readObject();
+
+//                    if (!response.getAction().equals("message")) {
+//                        System.out.println("받은 character");
+//                        for (CharacterTemplate ct:
+//                                response.getCharacters()) {
+//                            System.out.println(ct.getHealth());
+//                        }
+//                    }
+
                     gameUI.handleServerResponse(response);
                 }
             } catch (IOException | ClassNotFoundException e) {
