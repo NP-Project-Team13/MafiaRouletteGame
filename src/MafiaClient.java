@@ -74,7 +74,7 @@ public class MafiaClient {
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
     }
 
-    public void sendShootRequest(CharacterTemplate shooter, CharacterTemplate target, int currentSlot) {
+    public void sendShootRequest(CharacterTemplate shooter, CharacterTemplate target) {
         String targetNickname = target.getName(); // 타겟의 이름
         ClientAction action = new ClientAction("shoot", targetNickname);
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송

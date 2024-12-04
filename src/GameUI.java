@@ -17,7 +17,7 @@ public class GameUI {
     private int currentPlayerIndex;
     private int roundNumber = 1;
     private List<Boolean> bulletPositions;
-    private int currentSlot = 1;
+
 
     public GameUI(MafiaClient client) {
         this.client = client; // 클라이언트 인스턴스 초기화
@@ -159,9 +159,6 @@ public class GameUI {
             }
         }
 
-        JLabel bulletLabel2 = new JLabel(" [현재 슬롯] " + (currentSlot));
-        bulletLabel2.setForeground(Color.WHITE); // 총알 슬롯 레이블 색상 설정
-        playerInfoPanel.add(bulletLabel2);
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
     }
@@ -169,10 +166,8 @@ public class GameUI {
         CharacterTemplate target = selectTarget("타겟을 선택하세요");
         if (target == null) return;
 
-        logMessage(currentCharacter.getName() + "이(가) " + target.getName() + "을(를) 향해 슬롯 " + currentSlot + "에서 총을 쏩니다!");
-
         // 서버에 총 쏘기 요청 전송
-        client.sendShootRequest(currentCharacter, target, currentSlot);
+        client.sendShootRequest(currentCharacter, target);
     }
 
     private void useAbility(CharacterTemplate currentCharacter) {
