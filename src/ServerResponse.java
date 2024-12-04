@@ -1,8 +1,9 @@
 import characters.CharacterTemplate;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ServerResponse {
+public class ServerResponse implements Serializable {
     private String action;
     private String message;
     private List<CharacterTemplate> characters; // 플레이어 정보 리스트
@@ -19,6 +20,11 @@ public class ServerResponse {
         this.chambers = chambers;
         this.roundNumber = roundNumber;
         this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    public ServerResponse(String message) {
+        this.action = "message";
+        this.message = message;
     }
 
     public String getAction() {
