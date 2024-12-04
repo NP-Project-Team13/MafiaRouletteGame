@@ -170,11 +170,11 @@ public class MafiaServer {
         if (hit) {
             target.getCharacter().receiveDamage();
 
-//                for (ClientHandler ch :
-//                        clients) {
-//                    System.out.print(ch.getCharacter().getHealth()+" ");
-//                }
-//            System.out.println();
+                for (ClientHandler ch :
+                        clients) {
+                    System.out.print(ch.getCharacter().getHealth()+" ");
+                }
+            System.out.println();
         }
 
         return new ServerResponse("shoot",

@@ -2,6 +2,8 @@ import characters.CharacterTemplate; // Character0로 변경
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,15 +97,22 @@ public class GameUI {
                 );
                 playerPanel.add(playerInfo);
 
-                if (characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())) {
-                    JButton shootButton = new JButton("Shoot");
-                    shootButton.addActionListener(e -> shoot(character));
-                    playerPanel.add(shootButton);
-                }
-                if (character.getName().equals(client.getNickname())) {
-                    JButton abilityButton = new JButton("Use Ability");
-                    abilityButton.addActionListener(e -> useAbility(character));
-                    playerPanel.add(abilityButton);
+                // 생존 여부에 따라 패널의 색상 조정 및 버튼 생성
+                if (!character.isAlive()) {
+                    playerPanel.setBackground(new Color(255, 0, 0, 120));
+                }else {
+                    // 턴의 여부에 따라 Shoot 버튼 생성
+                    if (characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())) {
+                        JButton shootButton = new JButton("Shoot");
+                        shootButton.addActionListener(e -> shoot(character));
+                        playerPanel.add(shootButton);
+                    }
+                    // 본인 Character의 useAbility 버튼 생성
+                    if (character.getName().equals(client.getNickname())) {
+                        JButton abilityButton = new JButton("Use Ability");
+                        abilityButton.addActionListener(e -> useAbility(character));
+                        playerPanel.add(abilityButton);
+                    }
                 }
 
                 playerInfoPanel.add(playerPanel);
@@ -144,14 +153,20 @@ public class GameUI {
     }
 
     private CharacterTemplate selectTarget(String message) {
+        // isAlive()가 true인 캐릭터만 필터링
+        List<CharacterTemplate> aliveCharacters = characters.stream()
+                .filter(CharacterTemplate::isAlive)
+                .collect(Collectors.toList());
+
+        // JOptionPane을 사용하여 대상 선택
         return (CharacterTemplate) JOptionPane.showInputDialog(
                 null,
                 message,
                 "대상 선택",
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                characters.toArray(),
-                characters.get(0) // 기본 선택
+                aliveCharacters.toArray(), // 필터링된 캐릭터 배열
+                aliveCharacters.get(0) // 기본 선택
         );
     }
 
