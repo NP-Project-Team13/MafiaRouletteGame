@@ -170,16 +170,20 @@ public class MafiaServer {
         if (hit) {
             target.getCharacter().receiveDamage();
 
-                for (ClientHandler ch :
-                        clients) {
-                    System.out.print(ch.getCharacter().getHealth()+" ");
-                }
+            for (ClientHandler ch :
+                    clients) {
+                System.out.print(ch.getCharacter().getHealth() + " ");
+            }
             System.out.println();
-        }
 
-        return new ServerResponse("shoot",
-                shooter.getNickname() + "이(가) " + (hit ? targetNickname + "을(를) 적중시켰습니다." : "빗맞췄습니다."),
+            return new ServerResponse("shoot",
+                    shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다.",
+                    collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+        }
+        return new ServerResponse("miss",
+                shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다.",
                 collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+
     }
 
     private List<CharacterTemplate> collectCharacters() {

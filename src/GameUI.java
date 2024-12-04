@@ -225,6 +225,11 @@ public class GameUI {
             case "message" -> logMessage(response.getMessage());
             case "shoot" -> {
                 logMessage(response.getMessage());
+                SoundPlayer.playSound("/resources/총소리.wav"); // 음향 재생
+            }
+            case "miss" -> {
+                logMessage(response.getMessage());
+                SoundPlayer.playSound("/resources/빈총소리.wav"); // 음향 재생
             }
             case "useAbility" -> {
                 logMessage(response.getMessage());
