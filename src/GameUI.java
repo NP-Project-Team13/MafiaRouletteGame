@@ -1,11 +1,14 @@
-import characters.CharacterTemplate; // Character0로 변경
+import characters.CharacterTemplate;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameUI {
+    private JFrame frame;
     private JTextArea gameLog;
     private JLabel turnLabel;
     private JPanel playerInfoPanel;
@@ -13,34 +16,32 @@ public class GameUI {
     private List<CharacterTemplate> characters; // Character0 리스트로 변경
     private int currentPlayerIndex;
     private int roundNumber = 1;
-    private static final int CYLINDER_SIZE = 5;
     private List<Boolean> bulletPositions;
-    private int turnCounter = 0;
-    private int currentSlot = 1;
+    private JTextField chatInputField; // 채팅 입력 필드
 
     public GameUI(MafiaClient client) {
         this.client = client; // 클라이언트 인스턴스 초기화
         this.characters = new ArrayList<>();
-        initializeCharacters(); // 캐릭터 초기화
+        this.bulletPositions = new ArrayList<>();
     }
-
     public void createAndShowGUI() {
-        JFrame frame = new JFrame("Mafia Roulette - Game Screen");
+        frame = new JFrame("Mafia Roulette - Game Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 1000);
+        frame.getContentPane().setBackground(new Color(50, 50, 50));
 
         JPanel gameViewPanel = new JPanel(new BorderLayout());
-        gameViewPanel.setBackground(Color.DARK_GRAY);
+        gameViewPanel.setBackground(new Color(40, 40, 40));
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // 뒤로가기 버튼
         JButton backButton = new JButton("뒤로가기");
         backButton.setFont(new Font("Serif", Font.BOLD, 16));
+        backButton.setBackground(new Color(80, 80, 80));
+        backButton.setForeground(Color.WHITE);
         backButton.addActionListener(e -> goBack(frame));
 
-//        turnLabel = new JLabel("현재 턴: " + characters.get(currentPlayerIndex).getName() + " | 라운드: " + roundNumber, SwingConstants.CENTER);
         turnLabel = new JLabel("게임 대기중", SwingConstants.CENTER);
         turnLabel.setFont(new Font("Serif", Font.BOLD, 28));
         turnLabel.setForeground(Color.RED);
@@ -53,7 +54,7 @@ public class GameUI {
         gameLog.setEditable(false);
         gameLog.setLineWrap(true);
         gameLog.setWrapStyleWord(true);
-        gameLog.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        gameLog.setFont(new Font("Monospaced", Font.PLAIN, 16)); // 글씨 크기 증가
         gameLog.setBackground(new Color(30, 30, 30));
         gameLog.setForeground(Color.WHITE);
         JScrollPane logScrollPane = new JScrollPane(gameLog);
@@ -63,7 +64,6 @@ public class GameUI {
         playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.Y_AXIS));
         playerInfoPanel.setOpaque(false);
 
-//        initializeBullets();
         updatePlayerInfoPanel();
 
         frame.setLayout(new BorderLayout());
@@ -71,131 +71,129 @@ public class GameUI {
         frame.add(logScrollPane, BorderLayout.CENTER);
         frame.add(playerInfoPanel, BorderLayout.WEST);
 
+        // 게임 로그 스크롤 패널 아래에 채팅 입력 패널 추가
+        JPanel chatPanel = new JPanel(new BorderLayout());
+        chatInputField = new JTextField();
+        JButton sendButton = new JButton("전송");
+
+        sendButton.addActionListener(e -> sendChatMessage());
+
+        chatPanel.add(chatInputField, BorderLayout.CENTER);
+        chatPanel.add(sendButton, BorderLayout.EAST);
+
+        chatPanel.setPreferredSize(new Dimension(logScrollPane.getWidth(), 50)); // 높이 50으로 설정
+
+        // 프레임의 아래쪽에 채팅 패널 추가
+        frame.add(chatPanel, BorderLayout.SOUTH);
+
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
-//        logMessage("게임이 시작되었습니다. " + characters.get(currentPlayerIndex).getName() + "의 턴입니다.");
     }
 
-    private void initializeCharacters() {
-        // 서버에서 캐릭터 정보 받아오기
-//        for (int i = 0; i < 8; i++) {
-//            characters.add(new Character1("name" + (i + 1), "Team A")); // 예시로 Character1 사용
-//        }
-//        currentPlayerIndex = 0;
-    }
 
-    private void initializeBullets() {
-        // 서버로부터 bullet 정보 받아오기
-//        bulletPositions = new boolean[CYLINDER_SIZE];
-//        Random random = new Random();
-//        int bulletsInRound = Math.min(roundNumber, CYLINDER_SIZE);
-//
-//        for (int i = 0; i < bulletsInRound; i++) {
-//            int position;
-//            do {
-//                position = random.nextInt(CYLINDER_SIZE);
-//            } while (bulletPositions[position]);
-//            bulletPositions[position] = true;
-//        }
-//
-//        logMessage("라운드 " + roundNumber + " 시작! 총알이 장전된 슬롯: "/* + getBulletPositionsString()*/);
-    }
-
-    private String getBulletPositionsString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bulletPositions.size(); i++) {
-            if (bulletPositions.get(i)) {
-                sb.append(i + 1).append(" ");
-            }
+    private void sendChatMessage() {
+        String message = chatInputField.getText().trim(); // 입력된 메시지 가져오기
+        if (!message.isEmpty()) {
+            client.sendChatMessage(message); // 서버로 메시지 전송
+            chatInputField.setText(""); // 입력 필드 초기화
         }
-        return sb.toString().trim();
     }
 
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
         if (characters.isEmpty()) {
-            // 임시 정보 표시
-            JLabel tempInfo = new JLabel("플레이어 정보가 아직 로드되지 않았습니다.");
+            JLabel tempInfo = new JLabel("플레이어 정보가 아직 로드되지 않았습니다.", SwingConstants.CENTER);
+            tempInfo.setForeground(Color.WHITE);
             playerInfoPanel.add(tempInfo);
         } else {
             for (CharacterTemplate character : characters) {
                 JPanel playerPanel = new JPanel();
-                playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.Y_AXIS));
-                playerPanel.setBorder(BorderFactory.createTitledBorder(character.getName()));
+                playerPanel.setLayout(new GridBagLayout()); // GridBagLayout 사용
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.fill = GridBagConstraints.HORIZONTAL; // 수평 방향으로 꽉 채우기
+                gbc.weightx = 1.0; // 가중치 설정
 
-                JLabel playerInfo = new JLabel(
-                        String.format(" [팀] %s [체력] %d [능력] %s",
-                                character.getTeam(),
-                                character.getHealth(),
-                                character.getInfo())
-                );
-                playerPanel.add(playerInfo);
+                // TitledBorder 생성 및 속성 설정
+                TitledBorder border = BorderFactory.createTitledBorder(character.getName());
+                border.setTitleColor(Color.WHITE); // 제목 글씨 색상 설정
+                border.setTitleFont(new Font("Serif", Font.BOLD, 16)); // 제목 글씨 크기 설정
+                playerPanel.setBorder(border);
+                playerPanel.setPreferredSize(new Dimension(250, 150)); // 일관된 크기 설정
 
-                JButton shootButton = new JButton("Shoot");
-                shootButton.addActionListener(e -> shoot(character));
+                JLabel playerInfo1 = new JLabel(String.format(" Team: %s", character.getTeam()));
+                playerInfo1.setForeground(Color.WHITE); // 글씨 색상 흰색
+                playerInfo1.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
 
-                JButton abilityButton = new JButton("Use Ability");
-                abilityButton.addActionListener(e -> useAbility(character));
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                playerPanel.add(playerInfo1, gbc); // 팀 정보 추가
 
-                playerPanel.add(shootButton);
-                playerPanel.add(abilityButton);
+                // Life 정보를 하트 아이콘으로 표시
+                JPanel lifePanel = new JPanel();
+                lifePanel.setOpaque(false); // 투명하게 설정
+                int health = character.getHealth();
+                for (int i = 0; i < health; i++) {
+                    ImageIcon heartIcon = new ImageIcon(getClass().getResource("/resources/heart.png"));
+                    Image heartImage = heartIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH); // 크기 조정
+                    JLabel heartLabel = new JLabel(new ImageIcon(heartImage));
+                    lifePanel.add(heartLabel);
+                }
+
+                gbc.gridx = 0;
+                gbc.gridy = 1;
+                playerPanel.add(lifePanel, gbc); // 하트 아이콘 추가
+
+                // 능력 정보
+                JLabel playerInfo2 = new JLabel(String.format(" [능력] %s", character.getInfo()));
+                playerInfo2.setForeground(Color.WHITE); // 글씨 색상 흰색
+                playerInfo2.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
+
+                gbc.gridx = 0;
+                gbc.gridy = 2;
+                playerPanel.add(playerInfo2, gbc); // 능력 정보 추가
+
+                // 생존 여부에 따라 패널의 색상 조정 및 버튼 생성
+                if (!character.isAlive()) {
+                    playerPanel.setBackground(new Color(255, 0, 0, 120));
+                } else {
+                    playerPanel.setBackground(new Color(60, 60, 60));
+
+                    // Shoot 버튼 생성
+                    JButton shootButton = new JButton("Shoot");
+                    shootButton.setBackground(new Color(100, 100, 100));
+                    shootButton.setForeground(Color.WHITE);
+                    shootButton.setEnabled(characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())); // 상태에 따라 활성화 또는 비활성화
+                    gbc.gridx = 0;
+                    gbc.gridy = 3;
+                    gbc.weighty = 1.0; // 버튼이 패널을 꽉 채우도록 가중치 설정
+                    shootButton.addActionListener(e -> shoot(character));
+                    playerPanel.add(shootButton, gbc); // Shoot 버튼 추가
+
+                    // Use Ability 버튼 생성
+                    if (character.getName().equals(client.getNickname())) {
+                        JButton abilityButton = new JButton("Use Ability");
+                        abilityButton.setBackground(new Color(100, 100, 100));
+                        abilityButton.setForeground(Color.WHITE);
+                        gbc.gridx = 0;
+                        gbc.gridy = 4;
+                        abilityButton.addActionListener(e -> useAbility(character));
+                        playerPanel.add(abilityButton, gbc); // Use Ability 버튼 추가
+                    }
+                }
+
                 playerInfoPanel.add(playerPanel);
             }
         }
 
-//        JLabel bulletLabel = new JLabel(" [총알 슬롯] " + getBulletPositionsString());
-//        playerInfoPanel.add(bulletLabel);
-        JLabel bulletLabel2 = new JLabel(" [현재 슬롯] " + (currentSlot));
-        playerInfoPanel.add(bulletLabel2);
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
     }
-
-    private void nextTurn() {
-        do {
-            currentPlayerIndex = (currentPlayerIndex + 1) % characters.size();
-        } while (!characters.get(currentPlayerIndex).isAlive());
-
-        turnCounter++;
-
-        if (turnCounter >= alivePlayerCount()) {
-            logMessage("모든 플레이어가 턴을 완료했습니다. 라운드 " + roundNumber + " 종료!");
-            roundNumber++;
-            resetCharacterAbilities();
-            turnCounter = 0;
-        }
-
-        updateTurnLabel();
-        logMessage("▶ " + characters.get(currentPlayerIndex).getName() + "의 턴입니다.");
-        updatePlayerInfoPanel();
-    }
-
     private void shoot(CharacterTemplate currentCharacter) {
         CharacterTemplate target = selectTarget("타겟을 선택하세요");
         if (target == null) return;
 
-        logMessage(currentCharacter.getName() + "이(가) " + target.getName() + "을(를) 향해 슬롯 " + currentSlot + "에서 총을 쏩니다!");
-
         // 서버에 총 쏘기 요청 전송
-        client.sendShootRequest(currentCharacter, target, currentSlot);
-
-        // 슬롯 증가
-//        currentSlot = (currentSlot % CYLINDER_SIZE) + 1;
-
-//        if (!anyBulletsLeft()) {
-//            logMessage("모든 총알이 소모되었습니다. 총알 재장전 중...");
-//            initializeBullets(); // 총알 재장전
-//        }
-
-        nextTurn();
-    }
-
-    private boolean anyBulletsLeft() {
-        for (boolean bullet : bulletPositions) {
-            if (bullet) return true;
-        }
-        return false;
+        client.sendShootRequest(currentCharacter, target);
     }
 
     private void useAbility(CharacterTemplate currentCharacter) {
@@ -204,21 +202,10 @@ public class GameUI {
             return;
         }
 
-//        // 타겟 선택을 위한 입력 받기
-//        String targetNickname = JOptionPane.showInputDialog("능력을 사용할 타겟의 닉네임을 입력하세요:");
-//        if (targetNickname == null || targetNickname.trim().isEmpty()) {
-//            logMessage("타겟이 선택되지 않았습니다.");
-//            return;
-//        }
-
-//        // 서버에 능력 사용 요청 전송
-//        client.sendAbilityRequest(currentCharacter, targetNickname);
-
         // 서버에 능력 사용 요청 전송
         client.sendAbilityRequest(currentCharacter);
 
         logMessage(currentCharacter.getName() + "이(가) 능력을 사용했습니다.");
-        updatePlayerInfoPanel();
     }
 
     private void updateTurnLabel() {
@@ -226,23 +213,21 @@ public class GameUI {
     }
 
     private CharacterTemplate selectTarget(String message) {
+        // isAlive()가 true인 캐릭터만 필터링
+        List<CharacterTemplate> aliveCharacters = characters.stream()
+                .filter(CharacterTemplate::isAlive)
+                .collect(Collectors.toList());
+
+        // JOptionPane을 사용하여 대상 선택
         return (CharacterTemplate) JOptionPane.showInputDialog(
                 null,
                 message,
                 "대상 선택",
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                characters.toArray(),
-                characters.get(0) // 기본 선택
+                aliveCharacters.toArray(), // 필터링된 캐릭터 배열
+                aliveCharacters.get(0) // 기본 선택
         );
-    }
-
-    private void resetCharacterAbilities() {
-        for (CharacterTemplate character : characters) {
-            if (character.isAlive()) {
-                character.resetAbilityUsage();
-            }
-        }
     }
 
     public void logMessage(String message) {
@@ -264,17 +249,6 @@ public class GameUI {
         }
     }
 
-
-    private int alivePlayerCount() {
-        int count = 0;
-        for (CharacterTemplate character : characters) {
-            if (character.isAlive()) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     // 서버 응답 처리 메소드 추가
     public void handleServerResponse(ServerResponse response) {
         // 서버 응답에 따라 UI 업데이트 로직 추가
@@ -282,36 +256,39 @@ public class GameUI {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> logMessage(response.getMessage());
             case "shoot" -> {
-                updateGameState(response);
                 logMessage(response.getMessage());
+                SoundPlayer.playSound("/resources/총소리.wav"); // 음향 재생
+            }
+            case "miss" -> {
+                logMessage(response.getMessage());
+                SoundPlayer.playSound("/resources/빈총소리.wav"); // 음향 재생
             }
             case "useAbility" -> {
-                updateGameState(response);
                 logMessage(response.getMessage());
+            }
+            case "end" -> {
+                frame.dispose(); // 현재 창 닫기
+                MainMenu.createAndShowGUI(client, client.getGameUI()); // 메인 메뉴 화면으로 돌아가기
             }
 
             // 추가적인 응답 처리 로직
             default -> logMessage("알 수 없는 행동: " + response.getAction());
         }
-        updatePlayerInfoPanel(); // UI 업데이트
     }
 
     private void updateGameState(ServerResponse response) {
-
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
-        for (CharacterTemplate character : response.getCharacters()) {
+        for (CharacterTemplate character : characters) {
             logMessage(" - 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
         }
 
         // 총알 슬롯 상태 업데이트
         bulletPositions = response.getChambers();
-        StringBuilder chamberStatus = new StringBuilder("총알 슬롯 상태: ");
-        for (int i = 0; i < response.getChambers().size(); i++) {
-            chamberStatus.append("슬롯 ").append(i + 1).append(": ")
-                    .append(response.getChambers().get(i) ? "O " : "X ").append(", ");
-        }
-        logMessage(chamberStatus.toString());
+        String chamberStatus = bulletPositions.stream()
+                .map(bulletPosition -> " " + (bulletPosition ? "O " : "X "))
+                .collect(Collectors.joining("", "총알 슬롯 상태: " + "슬롯 ", ""));
+        logMessage(chamberStatus);
 
         // 현재 턴과 라운드 번호 업데이트
         currentPlayerIndex = response.getCurrentPlayerIndex();

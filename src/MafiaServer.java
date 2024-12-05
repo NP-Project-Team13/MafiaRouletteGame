@@ -155,6 +155,7 @@ public class MafiaServer {
     }
 
 
+    // todo 격발 여부 모든 유저에게 알림 필요
     public ServerResponse handleShoot(ClientHandler shooter, String targetNickname) {
         ClientHandler target = clients.stream()
                 .filter(client -> client.getNickname().equals(targetNickname))
@@ -169,11 +170,21 @@ public class MafiaServer {
 
         if (hit) {
             target.getCharacter().receiveDamage();
-        }
 
-        return new ServerResponse("shoot",
-                shooter.getNickname() + "이(가) " + (hit ? targetNickname + "을(를) 적중시켰습니다." : "빗맞췄습니다."),
+            for (ClientHandler ch :
+                    clients) {
+                System.out.print(ch.getCharacter().getHealth() + " ");
+            }
+            System.out.println();
+
+            return new ServerResponse("shoot",
+                    shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다.",
+                    collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+        }
+        return new ServerResponse("miss",
+                shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다.",
                 collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+
     }
 
     private List<CharacterTemplate> collectCharacters() {
@@ -223,7 +234,7 @@ public class MafiaServer {
         startVote();
 
         for (ClientHandler client : clients) {
-            // todo ui 종료 후에 mainmenu 출력
+            client.sendResponse(new ServerResponse()); // client에 end response 전달
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
         }
