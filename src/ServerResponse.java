@@ -28,6 +28,11 @@ public class ServerResponse implements Serializable {
         this.message = message;
     }
 
+    public ServerResponse(String message, String target){
+        this.action = message;
+        this.message = target;
+    }
+
     public ServerResponse() { // 게임 종료 시 전달하는 response 형태
         this.action = "end";
     }
