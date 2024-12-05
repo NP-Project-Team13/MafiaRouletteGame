@@ -17,7 +17,6 @@ public class MafiaClient {
             this.gameUI = new GameUI(this); // GameUI 인스턴스 초기화
             socket = new Socket(serverAddress, serverPort); // 서버 연결
             in = new ObjectInputStream(socket.getInputStream());
-//            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
             // 닉네임 전송
@@ -31,23 +30,26 @@ public class MafiaClient {
         }
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
+
     public void start() {
         new Thread(() -> {
             try {
                 while (true) {
-//                    String serverMessage = in.readLine();
-//                    // 서버 메시지가 null이 아니고 빈 문자열이 아닐 경우에만 처리
-//                    if (serverMessage != null && !serverMessage.trim().isEmpty()) {
-//                        if (serverMessage.startsWith("{")) {
-//                            ServerResponse response = JsonUtil.jsonToResponse(serverMessage);
-//                            // 서버 응답에 따라 UI 업데이트
-//                            gameUI.handleServerResponse(response);
-//                        } else {
-//                            // 서버 메시지를 gameLog에 출력
-//                            gameUI.logMessage("서버: " + serverMessage);
+                    ServerResponse response = (ServerResponse) in.readObject();
+
+                    // todo MafiaClient에서 response 받자마자 Characters의 health 확인
+//                    if (!response.getAction().equals("message")) {
+//                        System.out.println("받은 character");
+//                        for (CharacterTemplate ct:
+//                                response.getCharacters()) {
+//                            System.out.println(ct.getHealth());
 //                        }
 //                    }
-                    ServerResponse response = (ServerResponse) in.readObject();
+
                     gameUI.handleServerResponse(response);
                 }
             } catch (IOException | ClassNotFoundException e) {
@@ -57,47 +59,6 @@ public class MafiaClient {
         }).start(); // 수신 스레드 시작
     }
 
-
-//    public void start() {
-//        try (Scanner scanner = new Scanner(System.in)) {
-//            while (true) {
-//                String serverMessage = in.readLine();
-//                if (serverMessage.startsWith("{")) {
-//                    ServerResponse response = JsonUtil.jsonToResponse(serverMessage);
-//                    System.out.println("행동: " + response.getAction());
-//                    System.out.println("결과: " + response.getResult());
-//                    System.out.println("메시지: " + response.getMessage());
-//                } else {
-//                    System.out.println("서버: " + serverMessage);
-//                }
-//
-//                if (serverMessage.startsWith("당신의 턴")) {
-//                    System.out.print("행동을 선택하세요 ('총 쏘기' 또는 '능력 사용'): ");
-//                    String actionType = scanner.nextLine();
-//                    String target = null;
-//
-//                    if ("shoot".equalsIgnoreCase(actionType)) {
-//                        System.out.print("쏘고 싶은 플레이어의 닉네임을 입력하세요: ");
-//                        target = scanner.nextLine();
-//                    }else if ("useAbility".equalsIgnoreCase(actionType)) {
-//                        // 능력 사용일 경우 타겟 입력(필요할 때만)
-//                        System.out.print("능력을 사용할 타겟의 닉네임을 입력하세요 (없으면 엔터): ");
-//                        target = scanner.nextLine();
-//                        if (target.isEmpty()) target = null;
-//                    } else {
-//                        System.out.println("잘못된 행동입니다. 다시 선택해주세요.");
-//                        continue;
-//                    }
-//
-//                    ClientAction action = new ClientAction(actionType, target);
-//                    out.println(JsonUtil.actionToJson(action));
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.out.println("서버와의 연결이 끊어졌습니다.");
-//            e.printStackTrace();
-//        }
-//    }
 
     public GameUI getGameUI() {
         return gameUI;
@@ -113,10 +74,18 @@ public class MafiaClient {
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
     }
 
-    public void sendShootRequest(CharacterTemplate shooter, CharacterTemplate target, int currentSlot) {
+    public void sendShootRequest(CharacterTemplate shooter, CharacterTemplate target) {
         String targetNickname = target.getName(); // 타겟의 이름
         ClientAction action = new ClientAction("shoot", targetNickname);
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
+    }
+
+    // todo 채팅 기능 구현
+    public void sendChatMessage(String message) {
+        // 서버에 메시지 전송 로직 구현
+        // 예: 출력 스트림을 통해 메시지를 서버에 전송
+        out.println();
+        out.flush();
     }
 
     public static void main(String[] args) {
