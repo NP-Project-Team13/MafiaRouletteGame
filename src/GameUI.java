@@ -17,14 +17,13 @@ public class GameUI {
     private int currentPlayerIndex;
     private int roundNumber = 1;
     private List<Boolean> bulletPositions;
-
+    private JTextField chatInputField; // 채팅 입력 필드
 
     public GameUI(MafiaClient client) {
         this.client = client; // 클라이언트 인스턴스 초기화
         this.characters = new ArrayList<>();
         this.bulletPositions = new ArrayList<>();
     }
-
     public void createAndShowGUI() {
         frame = new JFrame("Mafia Roulette - Game Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,9 +71,34 @@ public class GameUI {
         frame.add(logScrollPane, BorderLayout.CENTER);
         frame.add(playerInfoPanel, BorderLayout.WEST);
 
+        // 게임 로그 스크롤 패널 아래에 채팅 입력 패널 추가
+        JPanel chatPanel = new JPanel(new BorderLayout());
+        chatInputField = new JTextField();
+        JButton sendButton = new JButton("전송");
+
+        sendButton.addActionListener(e -> sendChatMessage());
+
+        chatPanel.add(chatInputField, BorderLayout.CENTER);
+        chatPanel.add(sendButton, BorderLayout.EAST);
+
+        chatPanel.setPreferredSize(new Dimension(logScrollPane.getWidth(), 50)); // 높이 50으로 설정
+
+        // 프레임의 아래쪽에 채팅 패널 추가
+        frame.add(chatPanel, BorderLayout.SOUTH);
+
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+
+
+    private void sendChatMessage() {
+        String message = chatInputField.getText().trim(); // 입력된 메시지 가져오기
+        if (!message.isEmpty()) {
+            client.sendChatMessage(message); // 서버로 메시지 전송
+            chatInputField.setText(""); // 입력 필드 초기화
+        }
+    }
+
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
         if (characters.isEmpty()) {
@@ -142,6 +166,7 @@ public class GameUI {
                     gbc.gridx = 0;
                     gbc.gridy = 3;
                     gbc.weighty = 1.0; // 버튼이 패널을 꽉 채우도록 가중치 설정
+                    shootButton.addActionListener(e -> shoot(character));
                     playerPanel.add(shootButton, gbc); // Shoot 버튼 추가
 
                     // Use Ability 버튼 생성
@@ -151,6 +176,7 @@ public class GameUI {
                         abilityButton.setForeground(Color.WHITE);
                         gbc.gridx = 0;
                         gbc.gridy = 4;
+                        abilityButton.addActionListener(e -> useAbility(character));
                         playerPanel.add(abilityButton, gbc); // Use Ability 버튼 추가
                     }
                 }

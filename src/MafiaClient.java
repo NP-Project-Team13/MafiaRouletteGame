@@ -80,6 +80,14 @@ public class MafiaClient {
         out.println(JsonUtil.actionToJson(action)); // JSON으로 변환하여 서버로 전송
     }
 
+    // todo 채팅 기능 구현
+    public void sendChatMessage(String message) {
+        // 서버에 메시지 전송 로직 구현
+        // 예: 출력 스트림을 통해 메시지를 서버에 전송
+        out.println();
+        out.flush();
+    }
+
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Mafia Roulette Game");

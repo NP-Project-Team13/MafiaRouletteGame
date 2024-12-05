@@ -155,6 +155,7 @@ public class MafiaServer {
     }
 
 
+    // todo 격발 여부 모든 유저에게 알림 필요
     public ServerResponse handleShoot(ClientHandler shooter, String targetNickname) {
         ClientHandler target = clients.stream()
                 .filter(client -> client.getNickname().equals(targetNickname))
