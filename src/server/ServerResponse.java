@@ -1,6 +1,8 @@
+package server;
+
 import characters.CharacterTemplate;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.List;
 
 public class ServerResponse implements Serializable {
@@ -17,7 +19,7 @@ public class ServerResponse implements Serializable {
                           List<Boolean> chambers, int roundNumber, int currentPlayerIndex) {
         this.action = action;
         this.message = message;
-        this.characters = characters;
+        this.characters = deepCopyCharacters(characters);
         this.chambers = chambers;
         this.roundNumber = roundNumber;
         this.currentPlayerIndex = currentPlayerIndex;
@@ -36,7 +38,20 @@ public class ServerResponse implements Serializable {
     public ServerResponse() { // 게임 종료 시 전달하는 response 형태
         this.action = "end";
     }
+    private List<CharacterTemplate> deepCopyCharacters(List<CharacterTemplate> original) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(original);
+            oos.flush();
 
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            return (List<CharacterTemplate>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Character list deep copy failed.", e);
+        }
+    }
     public String getAction() {
         return action;
     }

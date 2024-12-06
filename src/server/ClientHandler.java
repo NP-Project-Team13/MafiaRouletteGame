@@ -1,9 +1,13 @@
+package server;
+
 import java.io.*;
 import java.net.*;
 
 import characters.CharacterTemplate;
-
-import javax.swing.*;
+import client.ClientAction;
+import resources.JsonUtil;
+import server.MafiaServer;
+import server.ServerResponse;
 
 public class ClientHandler implements Runnable {
     private Socket socket;

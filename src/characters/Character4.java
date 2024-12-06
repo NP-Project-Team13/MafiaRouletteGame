@@ -2,6 +2,9 @@
 // todo 수정 필요
 package characters;
 
+import server.ClientHandler;
+import server.MafiaServer;
+
 public class Character4 extends CharacterTemplate {
 
     protected boolean isReady = false; // 능력 발동 여부
@@ -45,8 +48,13 @@ public class Character4 extends CharacterTemplate {
         } else {
             result.append(name).append("이(가) 기관총을 발사하여 적 전체를 공격했습니다!\n");
             // todo 이 부분에 target 가지고 상대팀 배열 추출하도록 수정 필요
-            for (CharacterTemplate abilityTargetCharacter : abilityTargetCharacters) {
-                result.append(abilityTargetCharacter.receiveDamage());
+            for (ClientHandler clientHandler : MafiaServer.clients) {
+                CharacterTemplate enemyCharacter = clientHandler.getCharacter();
+
+                // 적군인지 확인
+                if (!enemyCharacter.getTeam().equals(this.team) && enemyCharacter.isAlive()) {
+                    result.append(enemyCharacter.receiveDamage()).append("\n");
+                }
             }
         }
         return result.toString();
