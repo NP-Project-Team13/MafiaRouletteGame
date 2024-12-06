@@ -88,6 +88,12 @@ public class MafiaClient {
         out.flush();
     }
 
+    public void sendVote(String player) {
+        ClientAction action = new ClientAction("vote", player);
+        out.println(JsonUtil.actionToJson(action));
+    }
+
+
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Mafia Roulette Game");

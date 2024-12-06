@@ -254,7 +254,13 @@ public class GameUI {
         // 서버 응답에 따라 UI 업데이트 로직 추가
         switch (response.getAction()) {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
-            case "message" -> logMessage(response.getMessage());
+            case "message" -> {
+                if(response.getMessage().equalsIgnoreCase("voteStart")) {
+                    votePlayer();
+                } else {
+                    logMessage(response.getMessage());
+                }
+            }
             case "shoot" -> {
                 logMessage(response.getMessage());
                 SoundPlayer.playSound("/resources/총소리.wav"); // 음향 재생
@@ -265,6 +271,18 @@ public class GameUI {
             }
             case "useAbility" -> {
                 logMessage(response.getMessage());
+            }
+            case "voteEnd" -> {
+                String mvp = response.getMessage();
+                JOptionPane.showMessageDialog(frame,
+                        "투표 결과 MVP 플레이어는 " + mvp + "로 선정되었습니다!",
+                        "MVP 투표 완료", JOptionPane.INFORMATION_MESSAGE);
+                logMessage("3초 후 메인 화면으로 돌아갑니다...");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             case "end" -> {
                 frame.dispose(); // 현재 창 닫기
@@ -295,5 +313,13 @@ public class GameUI {
         roundNumber = response.getRoundNumber();
         updateTurnLabel(); // 현재 턴 레이블 업데이트
         updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
+    }
+
+    public void votePlayer() {
+        CharacterTemplate voteCharacter = selectTarget("제일 활약이 좋았던 플레이어를 고르세요.");
+        String mvpPlayer = voteCharacter.getName();
+        if (mvpPlayer == null) return;
+
+        client.sendVote(mvpPlayer);
     }
 }

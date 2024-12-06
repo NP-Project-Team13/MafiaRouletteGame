@@ -23,4 +23,3 @@ public class ClientAction {
         this.target = target;
     }
 }
-

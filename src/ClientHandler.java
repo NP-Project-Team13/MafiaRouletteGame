@@ -10,9 +10,10 @@ public class ClientHandler implements Runnable {
     private MafiaServer server;
     private ObjectOutputStream out;
     private BufferedReader in;
-    private CharacterTemplate character;
     private String nickname;
+    private CharacterTemplate character;
     private String teams;
+    private String votePlayer = null;
     private boolean ready;
 
     public ClientHandler(Socket socket, MafiaServer server) {
@@ -74,16 +75,30 @@ public class ClientHandler implements Runnable {
                 // 능력 사용 처리 추가 가능
                 sendResponse(server.handleUseAbility(this, action.getTarget()));
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void votePlayer() {
+        try {
+            String actionJson = in.readLine();
+            ClientAction action = JsonUtil.jsonToAction(actionJson);
+
+            if ("vote".equalsIgnoreCase(action.getAction())) {
+                setVote(action.getTarget());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 해당 플레이어 투표 완료 여부
+    public boolean isVoteCompleted() {
+        return votePlayer != null;
+    }
+
     // 능력 사용 처리
-
-
     public void sendMessage(String message) {
         sendResponse(new ServerResponse(message));
     }
@@ -132,6 +147,14 @@ public class ClientHandler implements Runnable {
 
     public String getTeam() {
         return character.getTeam();
+    }
+
+    public void setVote(String player) {
+        votePlayer = player;
+    }
+
+    public String getVote() {
+        return votePlayer;
     }
 }
 
