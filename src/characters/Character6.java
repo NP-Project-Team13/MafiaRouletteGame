@@ -57,6 +57,10 @@ public class Character6 extends CharacterTemplate {
         return result.toString();
     }
 
+    public boolean isReady() {
+        return isReady;
+    }
+
     @Override
     public String resetRound() {
         StringBuilder result = new StringBuilder();
