@@ -244,10 +244,19 @@ public class GameUI {
     }
 
     private CharacterTemplate selectTarget(String message) {
-        // isAlive()가 true인 캐릭터만 필터링
+        // 현재 플레이어의 팀을 가져옵니다.
+        String currentPlayerTeam = characters.get(currentPlayerIndex).getTeam();
+
+        // isAlive()가 true인 캐릭터만 필터링하고, 팀이 다른 캐릭터만 포함
         List<CharacterTemplate> aliveCharacters = characters.stream()
-                .filter(CharacterTemplate::isAlive)
+                .filter(character -> character.isAlive() && !character.getTeam().equals(currentPlayerTeam)) // 팀이 다른 캐릭터
                 .collect(Collectors.toList());
+
+        // 힐러인 경우, 대상 선택에서 자신과 같은 팀의 캐릭터를 제외
+        CharacterTemplate currentCharacter = characters.get(currentPlayerIndex);
+        if (currentCharacter instanceof Character6) {
+            aliveCharacters.removeIf(character -> character.getTeam().equals(currentPlayerTeam)); // 자신과 같은 팀의 캐릭터 제거
+        }
 
         // JOptionPane을 사용하여 대상 선택
         return (CharacterTemplate) JOptionPane.showInputDialog(
@@ -257,9 +266,10 @@ public class GameUI {
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 aliveCharacters.toArray(), // 필터링된 캐릭터 배열
-                aliveCharacters.get(0) // 기본 선택
+                aliveCharacters.isEmpty() ? null : aliveCharacters.get(0) // 기본 선택 (빈 리스트 체크)
         );
     }
+
 
     private CharacterTemplate selectVote(String message) {
         List<CharacterTemplate> Characters = characters.stream()
@@ -343,6 +353,16 @@ public class GameUI {
     private void updateGameState(ServerResponse response) {
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
+//        characterLog(response);
+
+        // 현재 턴과 라운드 번호 업데이트
+        currentPlayerIndex = response.getCurrentPlayerIndex();
+        roundNumber = response.getRoundNumber();
+        updateTurnLabel(); // 현재 턴 레이블 업데이트
+        updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
+    }
+
+    private void characterLog(ServerResponse response) {
         logMessage("\n\n");
         for (CharacterTemplate character : characters) {
             logMessage("   📍 [" + character.getTeam() + "팀] " + (character.isAlive() ? "생존자 " : "사망자 ") + character.getName() +
@@ -356,12 +376,6 @@ public class GameUI {
                 .map(bulletPosition -> " " + (bulletPosition ? "O " : "X "))
                 .collect(Collectors.joining("", "\uD83D\uDCA1총알 슬롯 상태: " + "슬롯 ", ""));
         logMessage(chamberStatus+"\n");
-
-        // 현재 턴과 라운드 번호 업데이트
-        currentPlayerIndex = response.getCurrentPlayerIndex();
-        roundNumber = response.getRoundNumber();
-        updateTurnLabel(); // 현재 턴 레이블 업데이트
-        updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
     }
 
     public void votePlayer() {
