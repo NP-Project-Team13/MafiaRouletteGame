@@ -6,8 +6,6 @@ import java.net.*;
 import characters.CharacterTemplate;
 import client.ClientAction;
 import resources.JsonUtil;
-import server.MafiaServer;
-import server.ServerResponse;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -77,7 +75,7 @@ public class ClientHandler implements Runnable {
                 sendResponse(server.handleShoot(this, action.getTarget()));
             } else if ("useAbility".equalsIgnoreCase(action.getAction())) {
                 // 능력 사용 처리 추가 가능
-                sendResponse(server.handleUseAbility(this, action.getTarget()));
+                sendResponse(server.handleUseAbility(this));
             }
         } catch (IOException e) {
             e.printStackTrace();
