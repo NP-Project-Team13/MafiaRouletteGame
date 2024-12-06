@@ -2,7 +2,7 @@ package client;
 
 public class ClientAction {
     private String action; // "shoot" 또는 "useAbility"
-    private String target; // 타겟 플레이어 닉네임
+    private String target; // 타겟 플레이어 닉네임 또는 메세지
 
     public ClientAction(String action, String target) {
         this.action = action;
