@@ -4,7 +4,7 @@ package characters;
 
 public class Character2 extends CharacterTemplate {
 
-    private boolean deflectReady = false; // 총알 튕겨낼 준비 되었는지
+    private boolean isReady; // 총알 튕겨낼 준비 되었는지
 
     public Character2(String name, String team) {
         super(name, team, "총알을 튕겨내는 방어 능력");
@@ -22,7 +22,7 @@ public class Character2 extends CharacterTemplate {
             result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
             return result.toString();
         }
-        deflectReady = true;
+        isReady = true;
         result.append(name).append("은(는) 다음 총알을 튕겨낼 준비가 되었습니다.\n");
         setAbilityUsed(true);
         return result.toString();
@@ -32,9 +32,9 @@ public class Character2 extends CharacterTemplate {
     public String receiveDamage() {
         StringBuilder result = new StringBuilder();
 
-        if (deflectReady) {
+        if (isReady) {
             result.append(name).append("은(는) 총알을 튕겨냈습니다!\n");
-            deflectReady = false;
+            isReady = false;
         } else {
             result.append(name).append("이(가) 데미지를 받았습니다.\n");
             decreaseHealth();
@@ -46,7 +46,7 @@ public class Character2 extends CharacterTemplate {
     public String resetRound() {
         StringBuilder result = new StringBuilder();
         isAbilityUsed = false;
-        deflectReady = false;
+        isReady = false;
         result.append(name).append("의 능력 사용 가능 상태가 초기화되었습니다.\n");
         return result.toString();
     }
