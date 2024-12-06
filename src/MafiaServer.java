@@ -2,6 +2,8 @@ import characters.*;
 
 import java.io.*;
 import java.net.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -222,19 +224,96 @@ public class MafiaServer {
 
         String winner;
         if (isTeamAAlive && !isTeamBAlive) {
-            winner = "A팀";
+            winner = "A";
         } else if (isTeamBAlive && !isTeamAAlive) {
-            winner = "B팀";
+            winner = "B";
         } else {
             winner = "없음"; // 모든 팀이 전멸한 경우
         }
 
-        broadcast(winner + "이(가) 승리했습니다!");
+        broadcast(winner + "팀이 승리했습니다!");
+
+        startVote();
+        String mvpPlayer = voteCount();
+        writeHistory(winner, mvpPlayer);
 
         for (ClientHandler client : clients) {
             client.sendResponse(new ServerResponse()); // client에 end response 전달
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
+        }
+    }
+
+    private void startVote() {
+        broadcast("MVP 투표를 시작합니다!");
+
+        for (ClientHandler client : clients) {
+            client.sendResponse(new ServerResponse("voteStart")); // client에 투표 전달
+        }
+        for (ClientHandler client : clients) {
+            client.votePlayer();
+        }
+    }
+
+    private String voteCount() {
+        while (true) {
+            boolean allVoteCompleted = clients.stream().allMatch(ClientHandler::isVoteCompleted);
+            if (allVoteCompleted) {
+                broadcast("모든 플레이어의 투표가 완료되었습니다!");
+
+                Map<String, Integer> votes = new HashMap<>();
+                clients.forEach(client -> {
+                    votes.put(client.getNickname(), 0);
+                });
+                clients.forEach(client -> {
+                    votes.put(client.getVote(), votes.get(client.getVote()) + 1);
+                });
+
+                List<String> keys = new ArrayList<>(votes.keySet());
+                Collections.sort(keys, (v1, v2) -> (votes.get(v2).compareTo(votes.get(v1))));
+
+                String mvpPlayer = keys.get(0);
+
+                for (String key : keys) {
+                    System.out.print("Key : " + key);
+                    System.out.println(", Val : " + votes.get(key));
+                }
+                System.out.println("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+
+                broadcast("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+                for (ClientHandler client : clients) {
+                    client.sendResponse(new ServerResponse("voteEnd", mvpPlayer)); // client에 투표 전달
+                }
+
+                return mvpPlayer;
+            }
+        }
+    }
+
+    private void writeHistory(String winningTeam, String mvpPlayer) {
+        String filepath = "src/history.txt";
+        String history = "";
+        List<String> teamA = new ArrayList<>();
+        List<String> teamB = new ArrayList<>();
+        for (int i = 0; i < clients.size(); i++) {
+            if(clients.get(i).getTeam().equals("A")){
+                teamA.add(clients.get(i).getNickname());
+            } else {
+                teamB.add(clients.get(i).getNickname());
+            }
+        }
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(filepath, true))){
+            // 현재 날짜 가져오기
+            LocalDate currentDate = LocalDate.now();
+            // yy-MM-dd 형식의 포매터 정의
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd");
+            // 포맷팅된 문자열로 변환
+            String formattedDate = currentDate.format(formatter);
+            history += formattedDate + " " + teamA.get(0) + " " + teamA.get(1) + " " + teamB.get(0) + " " + teamB.get(1) + " " + winningTeam + " " + mvpPlayer;
+            pw.println(history);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
