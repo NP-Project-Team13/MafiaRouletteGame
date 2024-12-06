@@ -10,6 +10,7 @@ import server.ServerResponse;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,8 @@ public class GameUI {
     }
 
     public void createAndShowGUI() {
+
+
         frame = new JFrame("Mafia Roulette - Game Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 1000);
@@ -129,7 +132,7 @@ public class GameUI {
                 playerPanel.setPreferredSize(new Dimension(250, 150)); // 일관된 크기 설정
 
                 JLabel playerInfo1 = new JLabel(String.format(" Team: %s", character.getTeam()));
-                playerInfo1.setForeground(Color.WHITE); // 글씨 색상 흰색
+                playerInfo1.setForeground(Color.BLACK); // 글씨 색상 흰색
                 playerInfo1.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
 
                 gbc.gridx = 0;
@@ -188,7 +191,7 @@ public class GameUI {
     private JButton getAbilityButton(CharacterTemplate character, GridBagConstraints gbc) {
         JButton abilityButton = new JButton("Use Ability");
         abilityButton.setBackground(new Color(100, 100, 100));
-        abilityButton.setForeground(Color.WHITE);
+        abilityButton.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 4;
         abilityButton.addActionListener(e -> useAbility(character));
@@ -198,7 +201,7 @@ public class GameUI {
     private JButton getShootButton(CharacterTemplate character, GridBagConstraints gbc) {
         JButton shootButton = new JButton("Shoot");
         shootButton.setBackground(new Color(100, 100, 100));
-        shootButton.setForeground(Color.WHITE);
+        shootButton.setForeground(Color.BLACK);
 
         // Character가 힐러일 때
         if (character instanceof Character6) {
@@ -340,16 +343,19 @@ public class GameUI {
     private void updateGameState(ServerResponse response) {
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
+        logMessage("\n\n");
         for (CharacterTemplate character : characters) {
-            logMessage(" - 이름: " + character.getName() + " 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
+            logMessage("   📍 [" + character.getTeam() + "팀] " + (character.isAlive() ? "생존자 " : "사망자 ") + character.getName() +
+                    (character.getHealth() == 3 ? " ❤️❤️❤️" : (character.getHealth() == 2 ? " ❤️❤️" : (character.getHealth() == 1 ? " ❤️" : "")))
+            );
         }
 
         // 총알 슬롯 상태 업데이트
         bulletPositions = response.getChambers();
         String chamberStatus = bulletPositions.stream()
                 .map(bulletPosition -> " " + (bulletPosition ? "O " : "X "))
-                .collect(Collectors.joining("", "총알 슬롯 상태: " + "슬롯 ", ""));
-        logMessage(chamberStatus);
+                .collect(Collectors.joining("", "\uD83D\uDCA1총알 슬롯 상태: " + "슬롯 ", ""));
+        logMessage(chamberStatus+"\n");
 
         // 현재 턴과 라운드 번호 업데이트
         currentPlayerIndex = response.getCurrentPlayerIndex();

@@ -1,5 +1,4 @@
 // 6. 자신의 health -1 소모하여 아군을 health +1
-// todo 구현 완료
 package characters;
 
 public class Character6 extends CharacterTemplate {
@@ -31,16 +30,16 @@ public class Character6 extends CharacterTemplate {
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
         if (health <= 0) { // 자신
-            result.append(name).append("은(는) 이미 사망했기 때문에 ").append(isReady ? "살릴 수 없습니다." : "총을 쏠 수 없습니다.");
+            result.append(name).append("은(는) 이미 사망했기 때문에 ").append(isReady ? "살릴 수 없습니다.\n" : "총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (target.getHealth() <= 0) { // 상대
-            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 ").append(isReady ? "살릴 수 없습니다." : "총을 쏠 수 없습니다.");
+            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 ").append(isReady ? "살릴 수 없습니다.\n" : "총을 쏠 수 없습니다.\n");
             return result.toString();
         }
 
         if (!isReady) { // 공격 역할
-            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n")
+            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n")
                     .append(target.receiveDamage());
         } else { // 힐 역할
             if (health < 2) {
@@ -50,7 +49,7 @@ public class Character6 extends CharacterTemplate {
                 target.health++;
                 result.append(name).append("은(는) 자신의 체력을 1 소모하여 ").append(target.getName()).append("을(를) 1 치유했습니다.\n");
             } else {
-                result.append(name).append("은(는) 이미 체력이 최대이기 때문에 치유할 수 없습니다.");
+                result.append(name).append("은(는) 이미 체력이 최대이기 때문에 치유할 수 없습니다.\n");
             }
             isReady = false;
         }

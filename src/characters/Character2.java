@@ -1,5 +1,4 @@
 // 2. 총알을 튕겨내는 방어 능력 (매 라운드마다 능력 사용 여부 초기화)
-// todo 구현 완료
 package characters;
 
 public class Character2 extends CharacterTemplate {

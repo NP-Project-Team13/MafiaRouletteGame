@@ -17,6 +17,7 @@ import java.net.URL;
 
 public class MainMenu {
     public static void createAndShowGUI(MafiaClient client, GameUI gameUI) {
+
         JFrame frame = new JFrame("Mafia Roulette Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
