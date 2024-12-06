@@ -30,6 +30,7 @@ public class GameUI {
         this.characters = new ArrayList<>();
         this.bulletPositions = new ArrayList<>();
     }
+
     public void createAndShowGUI() {
         frame = new JFrame("Mafia Roulette - Game Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -194,6 +195,7 @@ public class GameUI {
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
     }
+
     private void shoot(CharacterTemplate currentCharacter) {
         CharacterTemplate target = selectTarget("타겟을 선택하세요");
         if (target == null) return;
@@ -261,7 +263,7 @@ public class GameUI {
         switch (response.getAction()) {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> {
-                if(response.getMessage().equalsIgnoreCase("voteStart")) {
+                if (response.getMessage().equalsIgnoreCase("voteStart")) {
                     votePlayer();
                 } else {
                     logMessage(response.getMessage());
@@ -304,7 +306,7 @@ public class GameUI {
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
         for (CharacterTemplate character : characters) {
-            logMessage(" - 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
+            logMessage(" - 이름: " + character.getName() + " 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
         }
 
         // 총알 슬롯 상태 업데이트
