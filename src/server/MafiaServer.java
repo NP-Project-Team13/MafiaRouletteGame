@@ -110,7 +110,7 @@ public class MafiaServer {
                     continue;
                 }
 
-                    // 게임 상태 전송
+                // 게임 상태 전송
                 sendGameStateToClients();
 
                 // 턴 시작 브로드캐스트
@@ -296,10 +296,20 @@ public class MafiaServer {
         }
 
         broadcast("투표 대기중");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+
+        // 모든 클라이언트의 투표가 완료될 때까지 대기
+        while (true) {
+            boolean allVotesCompleted = clients.stream().allMatch(ClientHandler::isVoteCompleted);
+            if (allVotesCompleted) {
+                broadcast("모든 플레이어가 투표를 완료했습니다!");
+                break;
+            }
+
+            try {
+                Thread.sleep(500); // 0.5초 간격으로 투표 상태 확인
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
