@@ -1,3 +1,8 @@
+package client;
+
+import client.GameUI;
+import client.MafiaClient;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;

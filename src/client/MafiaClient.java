@@ -1,4 +1,8 @@
+package client;
+
 import characters.CharacterTemplate;
+import resources.JsonUtil;
+import server.ServerResponse;
 
 import javax.swing.*;
 import java.io.*;
@@ -9,12 +13,12 @@ public class MafiaClient {
     private ObjectInputStream in;
     private PrintWriter out;
     private String nickname;
-    private GameUI gameUI; // GameUI 인스턴스 추가
+    private GameUI gameUI; // client.GameUI 인스턴스 추가
 
     public MafiaClient(String serverAddress, int serverPort, String nickname) {
         try {
             this.nickname = nickname; // 닉네임 설정
-            this.gameUI = new GameUI(this); // GameUI 인스턴스 초기화
+            this.gameUI = new GameUI(this); // client.GameUI 인스턴스 초기화
             socket = new Socket(serverAddress, serverPort); // 서버 연결
             in = new ObjectInputStream(socket.getInputStream());
             out = new PrintWriter(socket.getOutputStream(), true);

@@ -1,4 +1,7 @@
+package server;
+
 import characters.*;
+import resources.Gun;
 
 import java.io.*;
 import java.net.*;
@@ -8,7 +11,7 @@ import java.util.stream.Collectors;
 public class MafiaServer {
     private static final int PORT = 12345;
     private static final int MAX_PLAYERS = 4;
-    public List<ClientHandler> clients = new ArrayList<>();
+    public static List<ClientHandler> clients = new ArrayList<>();
     private int currentTurnIndex = 0;
     private int currentRound = 1; // 현재 라운드
     private Gun gun = new Gun();
@@ -147,8 +150,8 @@ public class MafiaServer {
         }
 
         try {
-            character.useAbility(/*target != null ? target.getCharacter() : null*/); // useAbility에는 argument가 존재하지 않음
-            return new ServerResponse("useAbility", user.getNickname() + "이(가) 능력을 사용했습니다.", collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+            String ablilitymessage = character.useAbility(); // useAbility에는 argument가 존재하지 않음
+            return new ServerResponse("useAbility", ablilitymessage, collectCharacters(), Gun.getChambers(), currentRound, currentTurnIndex);
         } catch (Exception e) {
             return new ServerResponse("error", "능력 사용 중 오류 발생: " + e.getMessage(), null, null, currentRound, currentTurnIndex);
         }

@@ -1,3 +1,5 @@
+package server;
+
 import characters.CharacterTemplate;
 
 import java.io.Serializable;

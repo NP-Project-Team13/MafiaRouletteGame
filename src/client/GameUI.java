@@ -1,4 +1,8 @@
+package client;
+
 import characters.CharacterTemplate;
+import resources.SoundPlayer;
+import server.ServerResponse;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
