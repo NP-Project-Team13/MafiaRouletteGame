@@ -244,19 +244,21 @@ public class GameUI {
     }
 
     private CharacterTemplate selectTarget(String message) {
-        // 현재 플레이어의 팀을 가져옵니다.
-        String currentPlayerTeam = characters.get(currentPlayerIndex).getTeam();
+        // 상대 플레이어의 팀을 가져옴
+        String teamToShow = characters.get(currentPlayerIndex).getTeam();
 
         // isAlive()가 true인 캐릭터만 필터링하고, 팀이 다른 캐릭터만 포함
         List<CharacterTemplate> aliveCharacters = characters.stream()
-                .filter(character -> character.isAlive() && !character.getTeam().equals(currentPlayerTeam)) // 팀이 다른 캐릭터
+                .filter(character -> character.isAlive() && !character.getTeam().equals(teamToShow)) // 팀이 다른 캐릭터
                 .collect(Collectors.toList());
 
-        // 힐러인 경우, 대상 선택에서 자신과 같은 팀의 캐릭터를 제외
+        // 힐러인 경우, 자신이 아닌 자기 팀을 가져옴
         CharacterTemplate currentCharacter = characters.get(currentPlayerIndex);
-        if (currentCharacter instanceof Character6) {
-            aliveCharacters.removeIf(character -> character.getTeam().equals(currentPlayerTeam)); // 자신과 같은 팀의 캐릭터 제거
+        if (currentCharacter instanceof Character6) {aliveCharacters = characters.stream()
+                .filter(character -> character.isAlive() && character.getTeam().equals(teamToShow) && !character.getName().equals(currentCharacter.getName())) // 팀이 같은 캐릭터
+                .collect(Collectors.toList());
         }
+
 
         // JOptionPane을 사용하여 대상 선택
         return (CharacterTemplate) JOptionPane.showInputDialog(
@@ -326,7 +328,7 @@ public class GameUI {
                 SoundPlayer.playSound("/resources/빈총소리.wav"); // 음향 재생
             }
             case "useAbility" -> {
-                logMessage(response.getMessage());
+                updateGameState(response); // useAbility시 턴이 바뀌지 않아 updateGameState가 한 번 호출됨
             }
             case "voteEnd" -> {
                 String mvp = response.getMessage();
