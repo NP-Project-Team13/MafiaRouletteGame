@@ -1,5 +1,4 @@
 // 5. 상대가 총에 맞으면 데미지 2배 주기 (전체 게임에 걸쳐 1회만 사용 가능)
-// todo 구현 완료
 package characters;
 
 public class Character5 extends CharacterTemplate {
@@ -32,14 +31,14 @@ public class Character5 extends CharacterTemplate {
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
         if (health <= 0) { // 자신
-            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (target.getHealth() <= 0) { // 상대
-            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
-        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
+        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n");
         if (isReady) {
             result.append(target.decreaseHealth());
             result.append(target.decreaseHealth());

@@ -1,3 +1,4 @@
+// 1. 총알의 위치를 확인하는 능력
 package characters;
 
 import java.util.List;

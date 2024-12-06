@@ -32,14 +32,14 @@ public abstract class CharacterTemplate implements Serializable {
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
         if (health <= 0) { // 자신
-            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (target.getHealth() <= 0) { // 상대
-            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
-        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!");
+        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n");
         result.append(target.receiveDamage());
         return result.toString();
     }
@@ -47,7 +47,7 @@ public abstract class CharacterTemplate implements Serializable {
     // 데미지 받기 (shoot 당하면 호출되는 메서드)
     public String receiveDamage() {
         StringBuilder result = new StringBuilder();
-        result.append(name).append("이(가) 데미지를 받았습니다.");
+        result.append(name).append("이(가) 데미지를 받았습니다.\n");
         result.append(decreaseHealth());
         return result.toString();
     }
@@ -56,9 +56,9 @@ public abstract class CharacterTemplate implements Serializable {
     public String decreaseHealth() {
         StringBuilder result = new StringBuilder();
         health--;
-        result.append(name).append("의 체력이 1 감소했습니다. 남은 체력: ").append(health);
+        result.append(name).append("의 체력이 1 감소했습니다. 남은 체력: ").append(health).append("\n");
         if (health <= 0) {
-            result.append(name).append("은(는) 사망했습니다.");
+            result.append(name).append("은(는) 사망했습니다.\n");
         }
         return result.toString();
     }
