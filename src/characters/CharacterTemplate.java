@@ -39,7 +39,7 @@ public abstract class CharacterTemplate implements Serializable {
             result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
-        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
+        result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n");
         result.append(target.receiveDamage());
         return result.toString();
     }

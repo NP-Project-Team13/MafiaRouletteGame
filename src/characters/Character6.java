@@ -39,7 +39,7 @@ public class Character6 extends CharacterTemplate {
         }
 
         if (!isReady) { // 공격 역할
-            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n")
+            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n")
                     .append(target.receiveDamage());
         } else { // 힐 역할
             if (health < 2) {

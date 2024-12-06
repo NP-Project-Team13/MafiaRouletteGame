@@ -23,7 +23,7 @@ public class Character3 extends CharacterTemplate {
             return result.toString();
         }
         if(!isReady){
-            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사했습니다!\n");
+            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n");
             result.append(target.receiveDamage());
         } else {
             result.append("\n").append(name).append("은(는) ").append(target.getName())

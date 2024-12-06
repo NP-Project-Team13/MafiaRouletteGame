@@ -1,7 +1,9 @@
 package server;
 
 import characters.*;
+import client.ClientAction;
 import resources.Gun;
+import resources.JsonUtil;
 
 import java.io.*;
 import java.net.*;
@@ -108,13 +110,16 @@ public class MafiaServer {
                     continue;
                 }
 
-                // 게임 상태 전송
+                    // 게임 상태 전송
                 sendGameStateToClients();
 
                 // 턴 시작 브로드캐스트
                 currentPlayer.startTurn();
 
-                currentTurnIndex = (currentTurnIndex + 1) % clients.size();
+                // 현재 턴 플레이어가 요청을 처리할 시간을 제공
+                waitForPlayerTurn(currentPlayer);
+                sendGameStateToClients();
+                System.out.println(currentPlayer.getNickname()+"의 턴 종료");
 
                 if (checkGameOver()) {
                     endGame();
@@ -122,10 +127,20 @@ public class MafiaServer {
                 }
 
             }
-//            broadcast("라운드가 종료되었습니다. 다음 라운드를 준비합니다.");
 
-            currentRound++; // 라운드 증가
+            System.out.println("라운드 종료");
+            // 라운드 종료 처리 및 resetRound 호출
+            
+            clients.forEach(client -> {
+                    String resetMessage = client.getCharacter().resetRound(); // resetRound 결과 받기
+                    client.sendMessage(resetMessage);
+            });
+
+            // 라운드 증가
+            currentRound++;
+            System.out.println("라운드 " + currentRound + " 종료");
         }
+
     }
 
     private void sendGameStateToClients() {
@@ -133,7 +148,7 @@ public class MafiaServer {
                 .map(ClientHandler::getCharacter)
                 .collect(Collectors.toList());
 
-        List<Boolean> chambers = gun.getChambers();
+        List<Boolean> chambers = Gun.getChambers();
 
         int currentPlayerIndex = currentTurnIndex;
         int roundNumber = currentRound;
@@ -156,6 +171,29 @@ public class MafiaServer {
         }
     }
 
+    /**
+     * 현재 턴 플레이어의 요청 처리 대기
+     */
+    private void waitForPlayerTurn(ClientHandler currentPlayer) {
+        while (true) {
+            if (!isCurrentTurn(currentPlayer)) {
+                break; // 턴 종료되면 루프 탈출
+            }
+            try{
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * 현재 턴 종료 처리
+     */
+    public void endCurrentTurn() {
+        currentTurnIndex = (currentTurnIndex + 1) % clients.size();
+    }
+
 
     // todo 격발 여부 모든 유저에게 알림 필요
     public ServerResponse handleShoot(ClientHandler shooter, String targetNickname) {
@@ -173,9 +211,8 @@ public class MafiaServer {
         String message;
 
         if (hit) {
-            target.getCharacter().receiveDamage();
             action = "shoot";
-            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다!✅";
+            message = shooter.getCharacter().shoot(target.getCharacter());
         } else {
             action = "miss";
             message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다!❌";
@@ -190,7 +227,10 @@ public class MafiaServer {
         }
 
         return response;
+    }
 
+    public boolean isCurrentTurn(ClientHandler client) {
+        return clients.get(currentTurnIndex).equals(client);
     }
 
     private List<CharacterTemplate> collectCharacters() {
@@ -254,8 +294,12 @@ public class MafiaServer {
         for (ClientHandler client : clients) {
             client.sendResponse(new ServerResponse("voteStart")); // client에 투표 전달
         }
-        for (ClientHandler client : clients) {
-            client.votePlayer();
+
+        broadcast("투표 대기중");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -295,7 +339,7 @@ public class MafiaServer {
     }
 
     private void writeHistory(String winningTeam, String mvpPlayer) {
-        String filepath = "src/history.txt";
+        String filepath = "src/resources/history.txt";
         String history = "";
         List<String> teamA = new ArrayList<>();
         List<String> teamB = new ArrayList<>();
