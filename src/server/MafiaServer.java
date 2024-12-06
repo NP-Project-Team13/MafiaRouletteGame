@@ -96,7 +96,7 @@ public class MafiaServer {
     private void startGame() {
         while (true) {
             // 라운드 시작 브로드캐스트
-//            broadcast("===== 라운드 " + currentRound + " 시작 =====");
+            broadcast("💎💎💎 라운드 " + currentRound + " 시작 💎💎💎");
 
             // 모든 플레이어의 턴 진행
             for (int i = 0; i < clients.size(); i++) {
@@ -175,10 +175,10 @@ public class MafiaServer {
         if (hit) {
             target.getCharacter().receiveDamage();
             action = "shoot";
-            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다!";
+            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다!✅";
         } else {
             action = "miss";
-            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다!";
+            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다!❌";
         }
 
         ServerResponse response = new ServerResponse(action, message, collectCharacters(), Gun.getChambers(), currentRound, currentTurnIndex);
@@ -202,7 +202,7 @@ public class MafiaServer {
 
     private void broadcast(String message) {
         for (ClientHandler client : clients) {
-            client.sendMessage(message);
+            client.sendMessage("📣 " + message);
         }
     }
 
