@@ -21,7 +21,7 @@ public class MafiaServer {
     // 캐릭터 클래스 리스트
     private List<Class<? extends CharacterTemplate>> characterClasses = Arrays.asList(
             Character1.class, Character2.class, Character3.class, Character4.class,
-            Character5.class, Character6.class, Character7.class
+            Character5.class, Character6.class
     );
 
     public static void main(String[] args) {
@@ -102,11 +102,16 @@ public class MafiaServer {
             for (int i = 0; i < clients.size(); i++) {
                 ClientHandler currentPlayer = clients.get(currentTurnIndex);
 
+                if(!currentPlayer.getCharacter().isAlive()){
+                    System.out.println(currentPlayer.getNickname() + "은(는) 사망했습니다. 턴을 건너뜁니다.");
+                    currentTurnIndex = (currentTurnIndex + 1) % clients.size();
+                    continue;
+                }
+
                 // 게임 상태 전송
                 sendGameStateToClients();
 
                 // 턴 시작 브로드캐스트
-//                broadcast("현재 턴: " + currentPlayer.getNickname() + "의 턴입니다.");
                 currentPlayer.startTurn();
 
                 currentTurnIndex = (currentTurnIndex + 1) % clients.size();
@@ -136,21 +141,13 @@ public class MafiaServer {
         clients.forEach(client -> client.sendResponse(new ServerResponse("updateGameState", "게임 상태 업데이트", characters, chambers, roundNumber, currentPlayerIndex)));
     }
 
-    public ServerResponse handleUseAbility(ClientHandler user, String targetNickname) {
+    public ServerResponse handleUseAbility(ClientHandler user) {
         CharacterTemplate character = user.getCharacter();
+
         if (character == null) {
             return new ServerResponse("error", "캐릭터가 설정되지 않았습니다.", null, null, currentRound, currentTurnIndex);
         }
-
-        ClientHandler target = clients.stream()
-                .filter(client -> client.getNickname().equals(targetNickname))
-                .findFirst()
-                .orElse(null);
-
-        if (target == null && character.getInfo().contains("대상 필요")) {
-            return new ServerResponse("error", "타겟 플레이어를 찾을 수 없습니다.", null, null, currentRound, currentTurnIndex);
-        }
-
+        System.out.println("Charater nickname: "+character.getName());
         try {
             String ablilitymessage = character.useAbility(); // useAbility에는 argument가 존재하지 않음
             return new ServerResponse("useAbility", ablilitymessage, collectCharacters(), Gun.getChambers(), currentRound, currentTurnIndex);
