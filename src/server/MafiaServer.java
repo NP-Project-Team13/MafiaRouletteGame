@@ -118,19 +118,29 @@ public class MafiaServer {
 
                 // 현재 턴 플레이어가 요청을 처리할 시간을 제공
                 waitForPlayerTurn(currentPlayer);
+                sendGameStateToClients();
+                System.out.println(currentPlayer.getNickname()+"의 턴 종료");
 
                 if (checkGameOver()) {
-                    sendGameStateToClients();
                     endGame();
                     return;
                 }
 
             }
-//            broadcast("라운드가 종료되었습니다. 다음 라운드를 준비합니다.");
-            // 라운드가 끝날 때 resetRound 호출
-            clients.forEach(client -> client.getCharacter().resetRound());
-            currentRound++; // 라운드 증가
+
+            System.out.println("라운드 종료");
+            // 라운드 종료 처리 및 resetRound 호출
+            
+            clients.forEach(client -> {
+                    String resetMessage = client.getCharacter().resetRound(); // resetRound 결과 받기
+                    client.sendMessage(resetMessage);
+            });
+
+            // 라운드 증가
+            currentRound++;
+            System.out.println("라운드 " + currentRound + " 종료");
         }
+
     }
 
     private void sendGameStateToClients() {
@@ -138,7 +148,7 @@ public class MafiaServer {
                 .map(ClientHandler::getCharacter)
                 .collect(Collectors.toList());
 
-        List<Boolean> chambers = gun.getChambers();
+        List<Boolean> chambers = Gun.getChambers();
 
         int currentPlayerIndex = currentTurnIndex;
         int roundNumber = currentRound;
@@ -166,18 +176,13 @@ public class MafiaServer {
      */
     private void waitForPlayerTurn(ClientHandler currentPlayer) {
         while (true) {
-            try {
-                // 요청 처리
-                currentPlayer.handleReq();
-                // 턴 종료 조건은 `handleShootAction`에서 처리
-                if (!isCurrentTurn(currentPlayer)) {
-                    break; // 턴 종료되면 루프 탈출
-                }
-            } catch (IOException e) {
-                System.out.println("요청 처리 중 오류 발생: " + currentPlayer.getNickname());
-                e.printStackTrace();
-                currentPlayer.closeConnection();
-                break;
+            if (!isCurrentTurn(currentPlayer)) {
+                break; // 턴 종료되면 루프 탈출
+            }
+            try{
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -289,8 +294,22 @@ public class MafiaServer {
         for (ClientHandler client : clients) {
             client.sendResponse(new ServerResponse("voteStart")); // client에 투표 전달
         }
-        for (ClientHandler client : clients) {
-            client.votePlayer();
+
+        broadcast("투표 대기중");
+
+        // 모든 클라이언트의 투표가 완료될 때까지 대기
+        while (true) {
+            boolean allVotesCompleted = clients.stream().allMatch(ClientHandler::isVoteCompleted);
+            if (allVotesCompleted) {
+                broadcast("모든 플레이어가 투표를 완료했습니다!");
+                break;
+            }
+
+            try {
+                Thread.sleep(500); // 0.5초 간격으로 투표 상태 확인
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -330,7 +349,7 @@ public class MafiaServer {
     }
 
     private void writeHistory(String winningTeam, String mvpPlayer) {
-        String filepath = "src/history.txt";
+        String filepath = "src/resources/history.txt";
         String history = "";
         List<String> teamA = new ArrayList<>();
         List<String> teamB = new ArrayList<>();
