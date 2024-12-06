@@ -1,5 +1,4 @@
 // 4. 기관총을 발사하여 적을 공격하는 능력. 총알이 있으면 무조건 적군 전체 데미지, 총알이 없으면 그냥 넘어감 (매 라운드마다 능력 사용 여부 초기화)
-// todo 수정 필요
 package characters;
 
 import server.ClientHandler;
@@ -8,7 +7,6 @@ import server.MafiaServer;
 public class Character4 extends CharacterTemplate {
 
     protected boolean isReady; // 능력 발동 여부
-    CharacterTemplate[] abilityTargetCharacters; // todo 사라질 예정인 변수
 
     public Character4(String name, String team) {
         super(name, team, "발사 후 아군 전체 또는 적군 전체에게 데미지");
@@ -37,11 +35,11 @@ public class Character4 extends CharacterTemplate {
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
         if (health <= 0) { // 자신
-            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (target.getHealth() <= 0) { // 상대
-            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (!isReady) {
@@ -49,13 +47,12 @@ public class Character4 extends CharacterTemplate {
             result.append(target.receiveDamage());
         } else {
             result.append(name).append("이(가) 기관총을 발사하여 적 전체를 공격했습니다!\n");
-            // todo 이 부분에 target 가지고 상대팀 배열 추출하도록 수정 필요
             for (ClientHandler clientHandler : MafiaServer.clients) {
                 CharacterTemplate enemyCharacter = clientHandler.getCharacter();
 
                 // 적군인지 확인
                 if (!enemyCharacter.getTeam().equals(this.team) && enemyCharacter.isAlive()) {
-                    result.append(enemyCharacter.receiveDamage()).append("\n");
+                    result.append(enemyCharacter.receiveDamage());
                 }
             }
         }

@@ -1,5 +1,4 @@
-// 7. 무작위로 생존 여부가 결정되는 "대박 아니면 쪽박" 능력 (나 아니면 너 OUT → 한명을 지목, 50:50 확률로 둘 중 한 명은 사망)
-// todo 구현 완료
+// 3. 무작위로 생존 여부가 결정되는 "대박 아니면 쪽박" 능력 (나 아니면 너 OUT → 한명을 지목, 50:50 확률로 둘 중 한 명은 사망)
 package characters;
 
 import java.util.Random;
@@ -16,11 +15,11 @@ public class Character3 extends CharacterTemplate {
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
         if (health <= 0) { // 자신
-            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (target.getHealth() <= 0) { // 상대
-            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.");
+            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if(!isReady){
