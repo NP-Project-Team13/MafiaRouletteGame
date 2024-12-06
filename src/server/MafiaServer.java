@@ -1,7 +1,9 @@
 package server;
 
 import characters.*;
+import client.ClientAction;
 import resources.Gun;
+import resources.JsonUtil;
 
 import java.io.*;
 import java.net.*;
@@ -114,16 +116,19 @@ public class MafiaServer {
                 // 턴 시작 브로드캐스트
                 currentPlayer.startTurn();
 
-                currentTurnIndex = (currentTurnIndex + 1) % clients.size();
+                // 현재 턴 플레이어가 요청을 처리할 시간을 제공
+                waitForPlayerTurn(currentPlayer);
 
                 if (checkGameOver()) {
+                    sendGameStateToClients();
                     endGame();
                     return;
                 }
 
             }
 //            broadcast("라운드가 종료되었습니다. 다음 라운드를 준비합니다.");
-
+            // 라운드가 끝날 때 resetRound 호출
+            clients.forEach(client -> client.getCharacter().resetRound());
             currentRound++; // 라운드 증가
         }
     }
@@ -156,6 +161,34 @@ public class MafiaServer {
         }
     }
 
+    /**
+     * 현재 턴 플레이어의 요청 처리 대기
+     */
+    private void waitForPlayerTurn(ClientHandler currentPlayer) {
+        while (true) {
+            try {
+                // 요청 처리
+                currentPlayer.handleReq();
+                // 턴 종료 조건은 `handleShootAction`에서 처리
+                if (!isCurrentTurn(currentPlayer)) {
+                    break; // 턴 종료되면 루프 탈출
+                }
+            } catch (IOException e) {
+                System.out.println("요청 처리 중 오류 발생: " + currentPlayer.getNickname());
+                e.printStackTrace();
+                currentPlayer.closeConnection();
+                break;
+            }
+        }
+    }
+
+    /**
+     * 현재 턴 종료 처리
+     */
+    public void endCurrentTurn() {
+        currentTurnIndex = (currentTurnIndex + 1) % clients.size();
+    }
+
 
     // todo 격발 여부 모든 유저에게 알림 필요
     public ServerResponse handleShoot(ClientHandler shooter, String targetNickname) {
@@ -173,9 +206,8 @@ public class MafiaServer {
         String message;
 
         if (hit) {
-            target.getCharacter().receiveDamage();
             action = "shoot";
-            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다!";
+            message = shooter.getCharacter().shoot(target.getCharacter());;
         } else {
             action = "miss";
             message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다!";
@@ -190,7 +222,10 @@ public class MafiaServer {
         }
 
         return response;
+    }
 
+    public boolean isCurrentTurn(ClientHandler client) {
+        return clients.get(currentTurnIndex).equals(client);
     }
 
     private List<CharacterTemplate> collectCharacters() {
