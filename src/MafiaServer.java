@@ -147,7 +147,7 @@ public class MafiaServer {
         }
 
         try {
-            character.useAbility(target != null ? target.getCharacter() : null);
+            character.useAbility(/*target != null ? target.getCharacter() : null*/); // useAbility에는 argument가 존재하지 않음
             return new ServerResponse("useAbility", user.getNickname() + "이(가) 능력을 사용했습니다.", collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
         } catch (Exception e) {
             return new ServerResponse("error", "능력 사용 중 오류 발생: " + e.getMessage(), null, null, currentRound, currentTurnIndex);
@@ -155,6 +155,7 @@ public class MafiaServer {
     }
 
 
+    // todo 격발 여부 모든 유저에게 알림 필요
     public ServerResponse handleShoot(ClientHandler shooter, String targetNickname) {
         ClientHandler target = clients.stream()
                 .filter(client -> client.getNickname().equals(targetNickname))
@@ -169,11 +170,21 @@ public class MafiaServer {
 
         if (hit) {
             target.getCharacter().receiveDamage();
-        }
 
-        return new ServerResponse("shoot",
-                shooter.getNickname() + "이(가) " + (hit ? targetNickname + "을(를) 적중시켰습니다." : "빗맞췄습니다."),
+            for (ClientHandler ch :
+                    clients) {
+                System.out.print(ch.getCharacter().getHealth() + " ");
+            }
+            System.out.println();
+
+            return new ServerResponse("shoot",
+                    shooter.getNickname() + "이(가) " + targetNickname + "을(를) 적중시켰습니다.",
+                    collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+        }
+        return new ServerResponse("miss",
+                shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다.",
                 collectCharacters(), gun.getChambers(), currentRound, currentTurnIndex);
+
     }
 
     private List<CharacterTemplate> collectCharacters() {
@@ -190,22 +201,38 @@ public class MafiaServer {
     }
 
     private boolean checkGameOver() {
-        long aliveCount = clients.stream()
-                .filter(client -> client.getCharacter().isAlive())
-                .count();
-        return aliveCount <= 1;
+        boolean isTeamAAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "A".equals(client.getCharacter().getTeam()));
+
+        boolean isTeamBAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "B".equals(client.getCharacter().getTeam()));
+
+        // A팀 또는 B팀 중 한 팀이 전멸하면 true 반환
+        return !(isTeamAAlive && isTeamBAlive);
     }
 
     private void endGame() {
         broadcast("게임이 종료되었습니다!");
-        String winner = clients.stream()
-                .filter(client -> client.getCharacter().isAlive())
-                .map(ClientHandler::getNickname)
-                .findFirst()
-                .orElse("없음");
+
+        boolean isTeamAAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "A".equals(client.getCharacter().getTeam()));
+
+        boolean isTeamBAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "B".equals(client.getCharacter().getTeam()));
+
+        String winner;
+        if (isTeamAAlive && !isTeamBAlive) {
+            winner = "A팀";
+        } else if (isTeamBAlive && !isTeamAAlive) {
+            winner = "B팀";
+        } else {
+            winner = "없음"; // 모든 팀이 전멸한 경우
+        }
+
         broadcast(winner + "이(가) 승리했습니다!");
 
         for (ClientHandler client : clients) {
+            client.sendResponse(new ServerResponse()); // client에 end response 전달
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
         }
