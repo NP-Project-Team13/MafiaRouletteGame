@@ -258,6 +258,21 @@ public class GameUI {
         );
     }
 
+    private CharacterTemplate selectVote(String message) {
+        List<CharacterTemplate> Characters = characters.stream()
+                .collect(Collectors.toList());
+
+        // JOptionPane을 사용하여 대상 선택
+        return (CharacterTemplate) JOptionPane.showInputDialog(
+                null,
+                message,
+                "MVP 투표",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                Characters.toArray(), // 필터링된 캐릭터 배열
+                Characters.get(0) // 기본 선택
+        );
+    }
     public void logMessage(String message) {
         gameLog.append(message + "\n");
         gameLog.setCaretPosition(gameLog.getDocument().getLength()); // 자동 스크롤
@@ -344,7 +359,7 @@ public class GameUI {
     }
 
     public void votePlayer() {
-        CharacterTemplate voteCharacter = selectTarget("제일 활약이 좋았던 플레이어를 고르세요.");
+        CharacterTemplate voteCharacter = selectVote("제일 활약이 좋았던 플레이어를 고르세요.");
         String mvpPlayer = voteCharacter.getName();
         if (mvpPlayer == null) return;
 

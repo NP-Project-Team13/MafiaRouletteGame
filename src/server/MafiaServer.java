@@ -100,11 +100,11 @@ public class MafiaServer {
             // 라운드 시작 브로드캐스트
 //            broadcast("===== 라운드 " + currentRound + " 시작 =====");
 
-                // 모든 플레이어의 턴 진행
-                for (int i = 0; i < clients.size(); i++) {
-                    ClientHandler currentPlayer = clients.get(currentTurnIndex);
+            // 모든 플레이어의 턴 진행
+            for (int i = 0; i < clients.size(); i++) {
+                ClientHandler currentPlayer = clients.get(currentTurnIndex);
 
-                    if(!currentPlayer.getCharacter().isAlive()){
+                if(!currentPlayer.getCharacter().isAlive()){
                     System.out.println(currentPlayer.getNickname() + "은(는) 사망했습니다. 턴을 건너뜁니다.");
                     currentTurnIndex = (currentTurnIndex + 1) % clients.size();
                     continue;
@@ -119,9 +119,8 @@ public class MafiaServer {
                 // 현재 턴 플레이어가 요청을 처리할 시간을 제공
                 waitForPlayerTurn(currentPlayer);
 
-                sendGameStateToClients();
-
                 if (checkGameOver()) {
+                    sendGameStateToClients();
                     endGame();
                     return;
                 }
@@ -167,13 +166,18 @@ public class MafiaServer {
      */
     private void waitForPlayerTurn(ClientHandler currentPlayer) {
         while (true) {
-            if (!isCurrentTurn(currentPlayer)) {
-                break; // 턴 종료되면 루프 탈출
-            }
             try {
-                Thread.sleep(100); // 100ms 대기
-            } catch (InterruptedException e) {
+                // 요청 처리
+                currentPlayer.handleReq();
+                // 턴 종료 조건은 `handleShootAction`에서 처리
+                if (!isCurrentTurn(currentPlayer)) {
+                    break; // 턴 종료되면 루프 탈출
+                }
+            } catch (IOException e) {
+                System.out.println("요청 처리 중 오류 발생: " + currentPlayer.getNickname());
                 e.printStackTrace();
+                currentPlayer.closeConnection();
+                break;
             }
         }
     }

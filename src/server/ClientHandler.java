@@ -102,18 +102,7 @@ public class ClientHandler implements Runnable {
         sendMessage("당신의 턴입니다. '총 쏘기' 또는 '능력 사용'을 선택하세요:");
     }
 
-    public void votePlayer() {
-        try {
-            String actionJson = in.readLine();
-            ClientAction action = JsonUtil.jsonToAction(actionJson);
 
-            if ("vote".equalsIgnoreCase(action.getAction())) {
-                setVote(action.getTarget());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     // 해당 플레이어 투표 완료 여부
     public boolean isVoteCompleted() {
