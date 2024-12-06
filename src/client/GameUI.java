@@ -325,16 +325,17 @@ public class GameUI {
     private void updateGameState(ServerResponse response) {
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
+        logMessage("\n\n");
         for (CharacterTemplate character : characters) {
-            logMessage(" - 이름: " + character.getName() + " 팀: " + character.getTeam() + ", 체력: " + character.getHealth() + ", 생존: " + (character.isAlive() ? "Yes" : "No"));
+            logMessage("   \uD83D\uDCCD 이름: " + character.getName() + " / 팀: " + character.getTeam() + " / 체력: " + character.getHealth() + " / 생존: " + (character.isAlive() ? "Yes" : "No"));
         }
 
         // 총알 슬롯 상태 업데이트
         bulletPositions = response.getChambers();
         String chamberStatus = bulletPositions.stream()
                 .map(bulletPosition -> " " + (bulletPosition ? "O " : "X "))
-                .collect(Collectors.joining("", "총알 슬롯 상태: " + "슬롯 ", ""));
-        logMessage(chamberStatus);
+                .collect(Collectors.joining("", "\uD83D\uDCA1총알 슬롯 상태: " + "슬롯 ", ""));
+        logMessage(chamberStatus+"\n");
 
         // 현재 턴과 라운드 번호 업데이트
         currentPlayerIndex = response.getCurrentPlayerIndex();
