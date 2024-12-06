@@ -1,5 +1,6 @@
 package client;
 
+import characters.Character6;
 import characters.CharacterTemplate;
 import client.MafiaClient;
 import client.MainMenu;
@@ -166,24 +167,12 @@ public class GameUI {
                     playerPanel.setBackground(new Color(60, 60, 60));
 
                     // Shoot 버튼 생성
-                    JButton shootButton = new JButton("Shoot");
-                    shootButton.setBackground(new Color(100, 100, 100));
-                    shootButton.setForeground(Color.WHITE);
-                    shootButton.setEnabled(characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())); // 상태에 따라 활성화 또는 비활성화
-                    gbc.gridx = 0;
-                    gbc.gridy = 3;
-                    gbc.weighty = 1.0; // 버튼이 패널을 꽉 채우도록 가중치 설정
-                    shootButton.addActionListener(e -> shoot(character));
+                    JButton shootButton = getShootButton(character, gbc);
                     playerPanel.add(shootButton, gbc); // Shoot 버튼 추가
 
                     // Use Ability 버튼 생성
                     if (character.getName().equals(client.getNickname())) {
-                        JButton abilityButton = new JButton("Use Ability");
-                        abilityButton.setBackground(new Color(100, 100, 100));
-                        abilityButton.setForeground(Color.WHITE);
-                        gbc.gridx = 0;
-                        gbc.gridy = 4;
-                        abilityButton.addActionListener(e -> useAbility(character));
+                        JButton abilityButton = getAbilityButton(character, gbc);
                         playerPanel.add(abilityButton, gbc); // Use Ability 버튼 추가
                     }
                 }
@@ -194,6 +183,37 @@ public class GameUI {
 
         playerInfoPanel.revalidate();
         playerInfoPanel.repaint();
+    }
+
+    private JButton getAbilityButton(CharacterTemplate character, GridBagConstraints gbc) {
+        JButton abilityButton = new JButton("Use Ability");
+        abilityButton.setBackground(new Color(100, 100, 100));
+        abilityButton.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        abilityButton.addActionListener(e -> useAbility(character));
+        return abilityButton;
+    }
+
+    private JButton getShootButton(CharacterTemplate character, GridBagConstraints gbc) {
+        JButton shootButton = new JButton("Shoot");
+        shootButton.setBackground(new Color(100, 100, 100));
+        shootButton.setForeground(Color.WHITE);
+
+        // Character가 힐러일 때
+        if (character instanceof Character6) {
+            Character6 character6 = (Character6) character;
+            if (character6.isReady()) {
+                shootButton.setText("Heal"); // 버튼의 텍스트를 "Heal"로 변경
+            }
+        }
+
+        shootButton.setEnabled(characters.get(currentPlayerIndex).getName().equals(client.getNickname()) && character.getName().equals(client.getNickname())); // 상태에 따라 활성화 또는 비활성화
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weighty = 1.0; // 버튼이 패널을 꽉 채우도록 가중치 설정
+        shootButton.addActionListener(e -> shoot(character));
+        return shootButton;
     }
 
     private void shoot(CharacterTemplate currentCharacter) {
