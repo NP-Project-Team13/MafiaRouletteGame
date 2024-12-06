@@ -55,6 +55,7 @@ public class Character4 extends CharacterTemplate {
                     result.append(enemyCharacter.receiveDamage());
                 }
             }
+            isReady = false;
         }
         return result.toString();
     }
