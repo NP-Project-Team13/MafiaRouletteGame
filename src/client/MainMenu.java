@@ -113,7 +113,7 @@ public class MainMenu {
                 textPane.setFont(new Font("Monospaced", Font.PLAIN, 14));
 
                 // 텍스트 내용 추가
-                String filepath = "src/history.txt";
+                String filepath = "src/resources/history.txt";
                 StyledDocument doc = textPane.getStyledDocument();
                 SimpleAttributeSet normal = new SimpleAttributeSet();
                 StyleConstants.setFontFamily(normal, "Monospaced");

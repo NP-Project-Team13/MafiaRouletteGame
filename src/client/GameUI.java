@@ -259,8 +259,7 @@ public class GameUI {
     }
 
     private CharacterTemplate selectVote(String message) {
-        // isAlive()가 true인 캐릭터만 필터링
-        List<CharacterTemplate> aliveCharacters = characters.stream()
+        List<CharacterTemplate> Characters = characters.stream()
                 .collect(Collectors.toList());
 
         // JOptionPane을 사용하여 대상 선택
@@ -270,8 +269,8 @@ public class GameUI {
                 "MVP 투표",
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                aliveCharacters.toArray(), // 필터링된 캐릭터 배열
-                aliveCharacters.get(0) // 기본 선택
+                Characters.toArray(), // 필터링된 캐릭터 배열
+                Characters.get(0) // 기본 선택
         );
     }
     public void logMessage(String message) {

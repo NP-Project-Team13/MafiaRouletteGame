@@ -295,7 +295,7 @@ public class MafiaServer {
     }
 
     private void writeHistory(String winningTeam, String mvpPlayer) {
-        String filepath = "src/history.txt";
+        String filepath = "src/resources/history.txt";
         String history = "";
         List<String> teamA = new ArrayList<>();
         List<String> teamB = new ArrayList<>();
