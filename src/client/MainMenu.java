@@ -1,3 +1,7 @@
+package client;
+
+import client.MafiaClient;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;

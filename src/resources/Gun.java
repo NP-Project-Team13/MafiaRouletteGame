@@ -1,3 +1,5 @@
+package resources;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +45,7 @@ public class Gun {
     public int getBullets() {
         return bullets;
     }
-    public List<Boolean> getChambers() {
+    public static List<Boolean> getChambers() {
         return chambers;
     }
 }
