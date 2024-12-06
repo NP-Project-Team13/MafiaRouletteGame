@@ -16,7 +16,7 @@ public class MafiaServer {
     // 캐릭터 클래스 리스트
     private List<Class<? extends CharacterTemplate>> characterClasses = Arrays.asList(
             Character1.class, Character2.class, Character3.class, Character4.class,
-            Character5.class, Character6.class, Character7.class
+            Character5.class, Character6.class
     );
 
     public static void main(String[] args) {
