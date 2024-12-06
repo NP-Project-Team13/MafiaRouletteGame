@@ -105,6 +105,7 @@ public class MafiaClient {
         // 클라이언트 연결 설정
 //        String serverAddress = JOptionPane.showInputDialog(frame, "서버 주소를 입력하세요:", "localhost");
 //        int serverPort = Integer.parseInt(JOptionPane.showInputDialog(frame, "서버 포트를 입력하세요:", "12345"));
+//        String serverAddress = "122.45.203.188";
         String serverAddress = "localhost";
         int serverPort = 12345;
         String nickname = JOptionPane.showInputDialog(frame, "닉네임을 입력하세요: ");
