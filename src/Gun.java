@@ -3,11 +3,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class Gun {
-    private int bullets; // 현재 총알 개수
-    private List<Boolean> chambers; // 총의 실린더 상태 (8개의 슬롯)
+    private static int bullets; // 현재 총알 개수
+    private static List<Boolean> chambers; // 총의 실린더 상태 (8개의 슬롯)
 
     public Gun() {
-        this.bullets = 4; // 처음엔 총알 1개
+        bullets = 4; // 처음엔 총알 1개
         initializeChambers();
     }
 

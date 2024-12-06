@@ -4,7 +4,7 @@ package characters;
 
 public class Character4 extends CharacterTemplate {
 
-    protected boolean isReady = false; // 능력 발동 여부
+    protected boolean isReady; // 능력 발동 여부
     CharacterTemplate[] abilityTargetCharacters; // todo 사라질 예정인 변수
 
     public Character4(String name, String team) {

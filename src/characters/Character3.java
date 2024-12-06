@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Character3 extends CharacterTemplate {
 
-    protected boolean isReady = false; // 능력 발동 여부
+    protected boolean isReady; // 능력 발동 여부
 
     public Character3(String name, String team) {
         super(name, team, "나 아니면 너 OUT");
