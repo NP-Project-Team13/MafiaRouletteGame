@@ -1,8 +1,6 @@
-import characters.Character1;
-import characters.CharacterTemplate;
+package resources;
 
-import java.util.ArrayList;
-import java.util.List;
+import client.ClientAction;
 
 public class JsonUtil {
     // 클라이언트의 행동을 JSON 문자열로 변환
@@ -10,7 +8,7 @@ public class JsonUtil {
         return "{ \"action\": \"" + action.getAction() + "\", \"target\": \"" + action.getTarget() + "\" }";
     }
 
-    // JSON 문자열을 `ClientAction` 객체로 변환
+    // JSON 문자열을 `client.ClientAction` 객체로 변환
     public static ClientAction jsonToAction(String json) {
         String[] parts = json.replace("{", "").replace("}", "").replace("\"", "").split(",");
         String actionType = parts[0].split(":")[1].trim();
@@ -19,7 +17,7 @@ public class JsonUtil {
     }
 
 //    // 서버의 응답을 JSON 문자열로 변환
-//    public static String responseToJson(ServerResponse response) {
+//    public static String responseToJson(server.ServerResponse response) {
 //        StringBuilder json = new StringBuilder();
 //        json.append("{");
 //        json.append("\"action\": \"").append(response.getAction()).append("\", ");
@@ -57,8 +55,8 @@ public class JsonUtil {
 //        return json.toString();
 //    }
 //
-//    // JSON 문자열을 `ServerResponse` 객체로 변환
-//    public static ServerResponse jsonToResponse(String json) {
+//    // JSON 문자열을 `server.ServerResponse` 객체로 변환
+//    public static server.ServerResponse jsonToResponse(String json) {
 //        String[] parts = json.replace("{", "").replace("}", "").replace("\"", "").split(",");
 //
 //        String action = parts[0].split(":")[1].trim();
@@ -102,7 +100,7 @@ public class JsonUtil {
 //            }
 //        }
 //
-//        return new ServerResponse(action, message, characters, chambers, roundNumber, currentPlayerIndex);
+//        return new server.ServerResponse(action, message, characters, chambers, roundNumber, currentPlayerIndex);
 //    }
 
 }

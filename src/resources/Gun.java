@@ -1,10 +1,12 @@
+package resources;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Gun {
     private int bullets; // 현재 총알 개수
-    private List<Boolean> chambers; // 총의 실린더 상태 (8개의 슬롯)
+    private static List<Boolean> chambers; // 총의 실린더 상태 (8개의 슬롯)
 
     public Gun() {
         this.bullets = 4; // 처음엔 총알 1개
@@ -43,7 +45,7 @@ public class Gun {
     public int getBullets() {
         return bullets;
     }
-    public List<Boolean> getChambers() {
+    public static List<Boolean> getChambers() {
         return chambers;
     }
 }
