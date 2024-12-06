@@ -52,15 +52,21 @@ public class Character6 extends CharacterTemplate {
             } else {
                 result.append(name).append("은(는) 이미 체력이 최대이기 때문에 치유할 수 없습니다.");
             }
+            isReady = false;
         }
 
         return result.toString();
+    }
+
+    public boolean isReady() {
+        return isReady;
     }
 
     @Override
     public String resetRound() {
         StringBuilder result = new StringBuilder();
         isAbilityUsed = false;
+        isReady = false;
         result.append(name).append("의 능력 사용 가능 상태가 초기화되었습니다.\n");
         return result.toString();
     }

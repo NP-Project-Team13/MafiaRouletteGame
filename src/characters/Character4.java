@@ -58,6 +58,7 @@ public class Character4 extends CharacterTemplate {
                     result.append(enemyCharacter.receiveDamage()).append("\n");
                 }
             }
+            isReady = false;
         }
         return result.toString();
     }
