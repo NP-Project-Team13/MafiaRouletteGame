@@ -37,9 +37,9 @@ public class ClientHandler implements Runnable {
             setNickname(in.readLine()); // 닉네임 수신
             System.out.println("닉네임 입력 완료: " + getNickname()); // 디버깅용 로그
 
-            // 클라이언트에 대기 메시지 전송
-//            sendMessage("게임 대기 중...");
-            handleReq();
+            while (true) {
+                handleReq(); // 요청 처리
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,33 +53,51 @@ public class ClientHandler implements Runnable {
         return ready;
     }
 
-    public void handleReq() {
-        try {
-            String actionJson = in.readLine();
-            ClientAction action = JsonUtil.jsonToAction(actionJson);
-            if (action.getAction().equals("ready")) { // 준비 상태 처리
-                setReady();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void handleReq() throws IOException {
+        String actionJson = in.readLine(); // 클라이언트로부터 요청 읽기
+        if (actionJson == null) {
+            throw new IOException("클라이언트 연결 종료");
         }
+
+        ClientAction action = JsonUtil.jsonToAction(actionJson);
+
+        switch (action.getAction().toLowerCase()) {
+            case "shoot" -> handleShootAction(action);
+            case "useability" -> handleUseAbilityAction();
+            case "ready" -> {
+                setReady();
+                sendMessage("준비 상태로 설정되었습니다.");
+            }
+            case "vote" -> {
+                setVote(action.getTarget());
+                sendMessage("투표 완료: " + action.getTarget());
+            }
+            default -> sendMessage("알 수 없는 요청입니다: " + action.getAction());
+        }
+    }
+
+    /**
+     * shoot 요청 처리
+     */
+    private void handleShootAction(ClientAction action) {
+        if (server.isCurrentTurn(this)) {
+            sendResponse(server.handleShoot(this, action.getTarget()));
+            server.endCurrentTurn(); // 턴 종료
+        } else {
+            sendMessage("총을 쏘려면 본인의 턴이어야 합니다.");
+        }
+    }
+
+    /**
+     * useAbility 요청 처리
+     */
+    private void handleUseAbilityAction() {
+        sendResponse(server.handleUseAbility(this));
+        // 턴 유지
     }
 
     public void startTurn() {
         sendMessage("당신의 턴입니다. '총 쏘기' 또는 '능력 사용'을 선택하세요:");
-        try {
-            String actionJson = in.readLine();
-            ClientAction action = JsonUtil.jsonToAction(actionJson);
-
-            if ("shoot".equalsIgnoreCase(action.getAction())) {
-                sendResponse(server.handleShoot(this, action.getTarget()));
-            } else if ("useAbility".equalsIgnoreCase(action.getAction())) {
-                // 능력 사용 처리 추가 가능
-                sendResponse(server.handleUseAbility(this));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void votePlayer() {
