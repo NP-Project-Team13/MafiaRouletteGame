@@ -30,37 +30,38 @@ public class MafiaServer {
         new MafiaServer().startServer();
     }
 
+    // 서버 시작
     public void startServer() {
         System.out.println("서버가 시작되었습니다.");
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            while (clients.size() < MAX_PLAYERS) {
-                Socket socket = serverSocket.accept();
-                System.out.println("새 클라이언트가 연결되었습니다.");
-                ClientHandler clientHandler = new ClientHandler(socket, this);
-                clients.add(clientHandler);
-                new Thread(clientHandler).start();
-            }
-            waitForReady();
-            System.out.println("모든 플레이어가 연결되었습니다. 게임을 시작합니다.");
-            assignTeamsAndCharacters();
-            startGame();
+            acceptPlayers(serverSocket); // 클라이언트 연결 대기
+            waitForReadyState(); // 모든 클라이언트 준비 상태 확인
+            System.out.println("모든 플레이어가 준비되었습니다. 게임을 시작합니다.");
+            assignTeamsAndCharacters(); // 팀 및 캐릭터 할당
+            startGame(); // 게임 시작
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // 모든 클라이언트의 닉네임 입력 완료 대기
-    private void waitForReady() {
-        while (true) {
-            boolean allPlayersReady = clients.stream().allMatch(ClientHandler::isReady);
-            if (allPlayersReady) {
-                System.out.println("모든 플레이어 준비 완료!");
-                break;
-            }
+    // 클라이언트 연결 처리
+    private void acceptPlayers(ServerSocket serverSocket) throws IOException {
+        while (clients.size() < MAX_PLAYERS) {
+            Socket socket = serverSocket.accept();
+            System.out.println("새 클라이언트가 연결되었습니다.");
+            ClientHandler clientHandler = new ClientHandler(socket, this);
+            clients.add(clientHandler);
+            new Thread(clientHandler).start();
+        }
+    }
+
+    // 모든 플레이어의 준비 상태를 확인
+    private void waitForReadyState() {
+        while (!clients.stream().allMatch(ClientHandler::isReady)) {
             try {
                 Thread.sleep(500); // 0.5초 대기
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -86,74 +87,70 @@ public class MafiaServer {
                 client.setCharacter(character);
                 client.setTeam(teams[i]);
 
-                // 클라이언트에게 할당 정보 전달
-//                client.sendMessage("당신은 " + teams[i] + "팀입니다.");
-//                client.sendMessage("캐릭터: " + characterClass.getSimpleName() + " - 능력: " + character.getInfo());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    // 게임 루프 시작
     private void startGame() {
         while (true) {
-            // 라운드 시작 브로드캐스트
-            broadcast("💎💎💎 라운드 " + currentRound + " 시작 💎💎💎");
+            broadcastMessage("💎💎💎 라운드 " + currentRound + " 시작 💎💎💎");
 
-            // 모든 플레이어의 턴 진행
             for (int i = 0; i < clients.size(); i++) {
-                ClientHandler currentPlayer = clients.get(currentTurnIndex);
-
-                if(!currentPlayer.getCharacter().isAlive()){
-                    System.out.println(currentPlayer.getNickname() + "은(는) 사망했습니다. 턴을 건너뜁니다.");
-                    currentTurnIndex = (currentTurnIndex + 1) % clients.size();
-                    continue;
-                }
-
-                // 게임 상태 전송
-                sendGameStateToClients();
-
-                // 턴 시작 브로드캐스트
-                currentPlayer.startTurn();
-
-                // 현재 턴 플레이어가 요청을 처리할 시간을 제공
-                waitForPlayerTurn(currentPlayer);
-                sendGameStateToClients();
-                System.out.println(currentPlayer.getNickname()+"의 턴 종료");
-
-                if (checkGameOver()) {
-                    endGame();
-                    return;
-                }
-
+                if (processTurn(clients.get(currentTurnIndex))) continue;
             }
 
-            System.out.println("라운드 종료");
-            // 라운드 종료 처리 및 resetRound 호출
-            
-            clients.forEach(client -> {
-                    String resetMessage = client.getCharacter().resetRound(); // resetRound 결과 받기
-                    client.sendMessage(resetMessage);
-            });
+            if (checkGameOver()) { // 게임 종료 조건 확인
+                endGame();
+                break;
+            }
 
-            // 라운드 증가
-            currentRound++;
-            System.out.println("라운드 " + currentRound + " 종료");
+            currentRound++; // 다음 라운드로 진행
+        }
+    }
+    // 턴 처리
+    private boolean processTurn(ClientHandler currentPlayer) {
+        if (!currentPlayer.getCharacter().isAlive()) {
+            System.out.println(currentPlayer.getNickname() + "은(는) 사망했습니다. 턴을 건너뜁니다.");
+            endCurrentTurn();
+            return true; // 턴을 건너뛴 경우
         }
 
+        sendGameStateToClients(); // 현재 게임 상태 전송
+        currentPlayer.startTurn(); // 현재 플레이어에게 턴 시작 알림
+        waitForPlayerTurnCompletion(currentPlayer); // 플레이어가 턴을 완료할 때까지 대기
+        sendGameStateToClients(); // 턴 종료 후 상태 업데이트
+        return false;
+    }
+    // 현재 턴 플레이어 요청 처리 대기
+    private void waitForPlayerTurnCompletion(ClientHandler currentPlayer) {
+        while (isCurrentTurn(currentPlayer)) {
+            try {
+                Thread.sleep(100); // 0.1초 간격으로 상태 확인
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    // 현재 턴 종료
+    public void endCurrentTurn() {
+        currentTurnIndex = (currentTurnIndex + 1) % clients.size(); // 다음 플레이어로 이동
     }
 
+    // 게임 상태를 모든 클라이언트에 전송
     private void sendGameStateToClients() {
-        List<CharacterTemplate> characters = clients.stream()
-                .map(ClientHandler::getCharacter)
-                .collect(Collectors.toList());
+        List<CharacterTemplate> characters = collectCharacters();
+        List<Boolean> chambers = Gun.getChambers(); // 총 상태 가져오기
 
-        List<Boolean> chambers = Gun.getChambers();
-
-        int currentPlayerIndex = currentTurnIndex;
-        int roundNumber = currentRound;
-
-        clients.forEach(client -> client.sendResponse(new ServerResponse("updateGameState", "게임 상태 업데이트", characters, chambers, roundNumber, currentPlayerIndex)));
+        clients.forEach(client -> client.sendResponse(new ServerResponse(
+                "updateGameState", "게임 상태 업데이트", characters, chambers, currentRound, currentTurnIndex
+        )));
+    }
+    // 모든 클라이언트에게 메시지 브로드캐스트
+    private void broadcastMessage(String message) {
+        clients.forEach(client -> client.sendMessage("📣 " + message));
     }
 
     public ServerResponse handleUseAbility(ClientHandler user) {
@@ -169,29 +166,6 @@ public class MafiaServer {
         } catch (Exception e) {
             return new ServerResponse("error", "능력 사용 중 오류 발생: " + e.getMessage(), null, null, currentRound, currentTurnIndex);
         }
-    }
-
-    /**
-     * 현재 턴 플레이어의 요청 처리 대기
-     */
-    private void waitForPlayerTurn(ClientHandler currentPlayer) {
-        while (true) {
-            if (!isCurrentTurn(currentPlayer)) {
-                break; // 턴 종료되면 루프 탈출
-            }
-            try{
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * 현재 턴 종료 처리
-     */
-    public void endCurrentTurn() {
-        currentTurnIndex = (currentTurnIndex + 1) % clients.size();
     }
 
 
@@ -258,34 +232,31 @@ public class MafiaServer {
     }
 
     private void endGame() {
-        broadcast("게임이 종료되었습니다!");
-
-        boolean isTeamAAlive = clients.stream()
-                .anyMatch(client -> client.getCharacter().isAlive() && "A".equals(client.getCharacter().getTeam()));
-
-        boolean isTeamBAlive = clients.stream()
-                .anyMatch(client -> client.getCharacter().isAlive() && "B".equals(client.getCharacter().getTeam()));
-
-        String winner;
-        if (isTeamAAlive && !isTeamBAlive) {
-            winner = "A";
-        } else if (isTeamBAlive && !isTeamAAlive) {
-            winner = "B";
-        } else {
-            winner = "없음"; // 모든 팀이 전멸한 경우
-        }
-
-        broadcast(winner + "팀이 승리했습니다!");
+        broadcastMessage("게임이 종료되었습니다!");
+        String winningTeam = determineWinningTeam();
+        broadcastMessage(winningTeam + "팀이 승리했습니다!");
 
         startVote();
         String mvpPlayer = voteCount();
-        writeHistory(winner, mvpPlayer);
+        writeHistory(winningTeam, mvpPlayer);
 
         for (ClientHandler client : clients) {
             client.sendResponse(new ServerResponse()); // client에 end response 전달
             client.sendMessage("게임이 종료되었습니다. 연결을 종료합니다.");
             client.closeConnection();
         }
+    }
+
+    // 승리 팀 결정
+    private String determineWinningTeam() {
+        boolean isTeamAAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "A".equals(client.getCharacter().getTeam()));
+        boolean isTeamBAlive = clients.stream()
+                .anyMatch(client -> client.getCharacter().isAlive() && "B".equals(client.getCharacter().getTeam()));
+
+        if (isTeamAAlive && !isTeamBAlive) return "A";
+        if (isTeamBAlive && !isTeamAAlive) return "B";
+        return "무승부"; // 양 팀이 모두 전멸한 경우
     }
 
     private void startVote() {

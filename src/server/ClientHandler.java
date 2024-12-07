@@ -8,15 +8,15 @@ import client.ClientAction;
 import resources.JsonUtil;
 
 public class ClientHandler implements Runnable {
-    private Socket socket;
-    private MafiaServer server;
-    private ObjectOutputStream out;
-    private BufferedReader in;
-    private String nickname;
-    private CharacterTemplate character;
-    private String teams;
-    private String votePlayer = null;
-    private boolean ready;
+    private final Socket socket; // 클라이언트와의 연결 소켓
+    private final MafiaServer server; // 서버 참조
+    private ObjectOutputStream out; // 클라이언트로 데이터 전송용 스트림
+    private BufferedReader in; // 클라이언트로부터 데이터 수신용 스트림
+    private String nickname; // 클라이언트의 닉네임
+    private CharacterTemplate character; // 플레이어 캐릭터 정보
+    private String team; // 플레이어 팀 정보
+    private String votePlayer; // 투표 대상
+    private boolean ready = false; // 준비 상태 플래그
 
     public ClientHandler(Socket socket, MafiaServer server) {
         this.socket = socket;
@@ -29,51 +29,46 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    // 클라이언트와의 통신을 처리하는 메인 스레드
     @Override
     public void run() {
         try {
-            // 닉네임 수신
-            System.out.println("클라이언트에서 닉네임을 기다리는 중...");
-            setNickname(in.readLine()); // 닉네임 수신
-            System.out.println("닉네임 입력 완료: " + getNickname()); // 디버깅용 로그
-
-            while (true) {
-                System.out.println("요청 처리이이 "); // 디버깅용 로그
-                handleReq(); // 요청 처리
-
-            }
+            receiveNickname(); // 닉네임 수신
+            processClientRequests(); // 클라이언트 요청 처리
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("클라이언트 연결 종료: " + nickname);
+        } finally {
+            closeConnection();
         }
     }
 
-    public void setReady() {
-        this.ready = true;
+    // 클라이언트의 닉네임을 수신
+    private void receiveNickname() throws IOException {
+        System.out.println("클라이언트에서 닉네임을 기다리는 중...");
+        this.nickname = in.readLine(); // 닉네임 수신
+        System.out.println("닉네임 입력 완료: " + nickname);
     }
 
-    public boolean isReady() {
-        return ready;
-    }
+    // 클라이언트 요청을 처리
+    private void processClientRequests() throws IOException {
+        while (true) {
+            String actionJson = in.readLine(); // 요청 데이터를 JSON으로 수신
+            if (actionJson == null) {
+                throw new IOException("클라이언트 연결이 종료되었습니다.");
+            }
 
-    public void handleReq() throws IOException {
-        String actionJson = in.readLine(); // 클라이언트로부터 요청 읽기
-        if (actionJson == null) {
-            throw new IOException("클라이언트 연결 종료");
+            ClientAction action = JsonUtil.jsonToAction(actionJson); // JSON을 ClientAction 객체로 변환
+            handleAction(action); // 요청에 따라 처리
         }
+    }
 
-        ClientAction action = JsonUtil.jsonToAction(actionJson);
-
+    // 클라이언트 요청에 따라 동작 수행
+    private void handleAction(ClientAction action) {
         switch (action.getAction().toLowerCase()) {
-            case "shoot" -> handleShootAction(action);
-            case "useability" -> handleUseAbilityAction();
-            case "ready" -> {
-                setReady();
-                sendMessage("준비 상태로 설정되었습니다.");
-            }
-            case "vote" -> {
-                setVote(action.getTarget());
-                sendMessage("투표 완료: " + action.getTarget());
-            }
+            case "shoot" -> handleShootAction(action); // 총 쏘기 요청
+            case "useability" -> handleUseAbilityAction(); // 능력 사용 요청
+            case "ready" -> handleReadyAction(); // 준비 요청
+            case "vote" -> handleVoteAction(action); // 투표 요청
             default -> sendMessage("알 수 없는 요청입니다: " + action.getAction());
         }
     }
@@ -98,15 +93,15 @@ public class ClientHandler implements Runnable {
         // 턴 유지
     }
 
-    public void startTurn() {
-        sendMessage("당신의 턴입니다. '총 쏘기' 또는 '능력 사용'을 선택하세요:");
+    // 'ready' 요청 처리
+    private void handleReadyAction() {
+        this.ready = true; // 준비 상태 설정
+        sendMessage("준비 상태로 설정되었습니다.");
     }
-
-
-
-    // 해당 플레이어 투표 완료 여부
-    public boolean isVoteCompleted() {
-        return votePlayer != null;
+    // 'vote' 요청 처리
+    private void handleVoteAction(ClientAction action) {
+        this.votePlayer = action.getTarget(); // 투표 대상 저장
+        sendMessage("투표 완료: " + votePlayer);
     }
 
     // 능력 사용 처리
@@ -116,18 +111,12 @@ public class ClientHandler implements Runnable {
 
     protected void sendResponse(ServerResponse response) {
         try {
-            // todo ClientHandler에서 sendResponse 전에 Characters의 health 확인
-//            if (!response.getAction().equals("message")) {
-//                for (CharacterTemplate ct :
-//                        response.getCharacters()) {
-//                    System.out.println(ct.getHealth());
-//                }
-//            }
             out.writeObject(response);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     public void closeConnection() {
         try {
             socket.close();
@@ -136,12 +125,23 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String getNickname() {
-        return this.nickname;
+    public void startTurn() {
+        sendMessage("당신의 턴입니다. '총 쏘기' 또는 '능력 사용'을 선택하세요:");
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    // 해당 플레이어 투표 완료 여부
+    public boolean isVoteCompleted() {
+        return votePlayer != null;
+    }
+
+    public String getNickname() {
+        return this.nickname;
     }
 
     public CharacterTemplate getCharacter() {
@@ -158,10 +158,6 @@ public class ClientHandler implements Runnable {
 
     public String getTeam() {
         return character.getTeam();
-    }
-
-    public void setVote(String player) {
-        votePlayer = player;
     }
 
     public String getVote() {
