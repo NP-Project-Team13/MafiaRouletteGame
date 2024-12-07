@@ -254,7 +254,7 @@ public class GameUI {
 
         // 힐러인 경우, 자신이 아닌 자기 팀을 가져옴
         CharacterTemplate currentCharacter = characters.get(currentPlayerIndex);
-        if (currentCharacter instanceof Character6) {aliveCharacters = characters.stream()
+        if (currentCharacter instanceof Character6 && ((Character6) currentCharacter).isReady()) {aliveCharacters = characters.stream()
                 .filter(character -> character.isAlive() && character.getTeam().equals(teamToShow) && !character.getName().equals(currentCharacter.getName())) // 팀이 같은 캐릭터
                 .collect(Collectors.toList());
         }
@@ -313,7 +313,7 @@ public class GameUI {
         switch (response.getAction()) {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> {
-                if (response.getMessage().equalsIgnoreCase("voteStart")) {
+                if (response.getMessage().equalsIgnoreCase("voteStart")) { // 투표 시작
                     votePlayer();
                 } else {
                     logMessage(response.getMessage());
@@ -331,7 +331,7 @@ public class GameUI {
                 logMessage(response.getMessage());
                 updateGameState(response); // useAbility시 턴이 바뀌지 않아 updateGameState가 한 번 호출됨
             }
-            case "voteEnd" -> {
+            case "voteEnd" -> { // 투표 종료
                 String mvp = response.getMessage();
                 JOptionPane.showMessageDialog(frame,
                         "투표 결과 MVP 플레이어는 " + mvp + "로 선정되었습니다!",
@@ -381,6 +381,7 @@ public class GameUI {
         logMessage(chamberStatus+"\n");
     }
 
+    // MVP 투표 UI
     public void votePlayer() {
         CharacterTemplate voteCharacter = selectVote("제일 활약이 좋았던 플레이어를 고르세요.");
         String mvpPlayer = voteCharacter.getName();
