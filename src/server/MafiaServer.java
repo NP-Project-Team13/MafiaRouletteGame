@@ -106,10 +106,23 @@ public class MafiaServer {
                 endGame();
                 break;
             }
-
+            // 각 플레이어의 능력을 초기화
+            resetPlayersForNewRound();
             currentRound++; // 다음 라운드로 진행
         }
     }
+
+    // 새로운 라운드를 위해 모든 플레이어의 능력을 초기화
+    private void resetPlayersForNewRound() {
+        clients.forEach(client -> {
+            CharacterTemplate character = client.getCharacter();
+            if (character != null && character.isAlive()) {
+                String resetMessage = character.resetRound(); // 캐릭터의 resetRound 호출
+                client.sendMessage("라운드 초기화: " + resetMessage); // 초기화 결과를 플레이어에게 알림
+            }
+        });
+    }
+
     // 턴 처리
     private boolean processTurn(ClientHandler currentPlayer) {
         if (!currentPlayer.getCharacter().isAlive()) {
