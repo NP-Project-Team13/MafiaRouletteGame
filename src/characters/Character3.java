@@ -45,6 +45,7 @@ public class Character3 extends CharacterTemplate {
     public String useAbility() {
         StringBuilder result = new StringBuilder();
         setAbilityUsed(true);
+        isReady = true;
         result.append(name).append("은(는) 대박 아니면 쪽박 능력을 사용할 준비가 되었습니다.\n");
         return result.toString();
     }

@@ -328,6 +328,7 @@ public class GameUI {
                 SoundPlayer.playSound("/resources/빈총소리.wav"); // 음향 재생
             }
             case "useAbility" -> {
+                logMessage(response.getMessage());
                 updateGameState(response); // useAbility시 턴이 바뀌지 않아 updateGameState가 한 번 호출됨
             }
             case "voteEnd" -> {

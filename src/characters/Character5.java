@@ -21,7 +21,7 @@ public class Character5 extends CharacterTemplate {
             result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
             return result.toString();
         }
-        result.append(name).append("은(는) 능력을 사용했습니다.\n");
+        result.append(name).append("의 총알의 데미지가 2배가 되었습니다.\n");
         setAbilityUsed(true);
         isReady = true;
         return result.toString();

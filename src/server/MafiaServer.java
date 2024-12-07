@@ -314,38 +314,31 @@ public class MafiaServer {
     }
 
     private String voteCount() {
-        while (true) {
-            boolean allVoteCompleted = clients.stream().allMatch(ClientHandler::isVoteCompleted);
-            if (allVoteCompleted) {
-                broadcast("모든 플레이어의 투표가 완료되었습니다!");
+        Map<String, Integer> votes = new HashMap<>();
+        clients.forEach(client -> {
+            votes.put(client.getNickname(), 0);
+        });
+        clients.forEach(client -> {
+            votes.put(client.getVote(), votes.get(client.getVote()) + 1);
+        });
 
-                Map<String, Integer> votes = new HashMap<>();
-                clients.forEach(client -> {
-                    votes.put(client.getNickname(), 0);
-                });
-                clients.forEach(client -> {
-                    votes.put(client.getVote(), votes.get(client.getVote()) + 1);
-                });
+        List<String> keys = new ArrayList<>(votes.keySet());
+        Collections.sort(keys, (v1, v2) -> (votes.get(v2).compareTo(votes.get(v1))));
 
-                List<String> keys = new ArrayList<>(votes.keySet());
-                Collections.sort(keys, (v1, v2) -> (votes.get(v2).compareTo(votes.get(v1))));
+        String mvpPlayer = keys.get(0);
 
-                String mvpPlayer = keys.get(0);
-
-                for (String key : keys) {
-                    System.out.print("Key : " + key);
-                    System.out.println(", Val : " + votes.get(key));
-                }
-                System.out.println("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
-
-                broadcast("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
-                for (ClientHandler client : clients) {
-                    client.sendResponse(new ServerResponse("voteEnd", mvpPlayer)); // client에 투표 전달
-                }
-
-                return mvpPlayer;
-            }
+        for (String key : keys) {
+            System.out.print("Key : " + key);
+            System.out.println(", Val : " + votes.get(key));
         }
+        System.out.println("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+
+        broadcast("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+        for (ClientHandler client : clients) {
+            client.sendResponse(new ServerResponse("voteEnd", mvpPlayer)); // client에 투표 전달
+        }
+
+        return mvpPlayer;
     }
 
     private void writeHistory(String winningTeam, String mvpPlayer) {
