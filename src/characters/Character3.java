@@ -44,6 +44,14 @@ public class Character3 extends CharacterTemplate {
     @Override
     public String useAbility() {
         StringBuilder result = new StringBuilder();
+        if (health <= 0) {
+            result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
+            return result.toString();
+        }
+        if (isAbilityUsed) {
+            result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
+            return result.toString();
+        }
         setAbilityUsed(true);
         isReady = true;
         result.append(name).append("은(는) 대박 아니면 쪽박 능력을 사용할 준비가 되었습니다.\n");

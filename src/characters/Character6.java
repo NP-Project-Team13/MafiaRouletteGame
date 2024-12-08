@@ -21,6 +21,7 @@ public class Character6 extends CharacterTemplate {
             result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
             return result.toString();
         }
+        result.append(name).append("이(가) 자신의 체력을 소모하여 아군의 체력을 치유할 준비를 했습니다.\n");
         isReady = true;
         setAbilityUsed(true);
         return result.toString();
