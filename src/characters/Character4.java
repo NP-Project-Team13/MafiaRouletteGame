@@ -9,7 +9,7 @@ public class Character4 extends CharacterTemplate {
     protected boolean isReady; // 능력 발동 여부
 
     public Character4(String name, String team) {
-        super(name, team, "발사 후 아군 전체 또는 적군 전체에게 데미지");
+        super(name, team, "발사 후 총알이 있으면 적군 전체에게 데미지");
     }
 
 

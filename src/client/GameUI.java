@@ -121,6 +121,7 @@ public class GameUI {
 
             JLabel tempInfo = new JLabel("", SwingConstants.CENTER);
             tempInfo.setForeground(Color.WHITE);
+            tempInfo.setFont(new Font("Serif", Font.BOLD, 35));
 //            tempInfo.setFont(loadCustomFont("/resources/Stylish.ttf", 30));
 
             GridBagConstraints gbc = new GridBagConstraints();
