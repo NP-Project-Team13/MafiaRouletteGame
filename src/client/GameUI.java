@@ -2,15 +2,12 @@ package client;
 
 import characters.Character6;
 import characters.CharacterTemplate;
-import client.MafiaClient;
-import client.MainMenu;
 import resources.SoundPlayer;
 import server.ServerResponse;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
