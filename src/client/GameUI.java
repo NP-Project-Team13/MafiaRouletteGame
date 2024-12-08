@@ -273,6 +273,7 @@ public class GameUI {
     }
 
 
+    // MVP 플레이어 선택 창
     private CharacterTemplate selectVote(String message) {
         List<CharacterTemplate> Characters = characters.stream()
                 .collect(Collectors.toList());
@@ -312,22 +313,22 @@ public class GameUI {
         // 서버 응답에 따라 UI 업데이트 로직 추가
         switch (response.getAction()) {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
-            case "message" -> {
+            case "message" -> { // 메시지 전송
                 if (response.getMessage().equalsIgnoreCase("voteStart")) { // 투표 시작
                     votePlayer();
                 } else {
                     logMessage(response.getMessage());
                 }
             }
-            case "shoot" -> {
+            case "shoot" -> { // 격발
                 logMessage(response.getMessage());
                 SoundPlayer.playSound("/resources/총소리.wav"); // 음향 재생
             }
-            case "miss" -> {
+            case "miss" -> { // 불발
                 logMessage(response.getMessage());
                 SoundPlayer.playSound("/resources/빈총소리.wav"); // 음향 재생
             }
-            case "useAbility" -> {
+            case "useAbility" -> { // 능력 사용
                 logMessage(response.getMessage());
                 updateGameState(response); // useAbility시 턴이 바뀌지 않아 updateGameState가 한 번 호출됨
             }
@@ -343,7 +344,7 @@ public class GameUI {
                     e.printStackTrace();
                 }
             }
-            case "end" -> {
+            case "end" -> { // 게임 종료
                 frame.dispose(); // 현재 창 닫기
                 MainMenu.createAndShowGUI(client, client.getGameUI()); // 메인 메뉴 화면으로 돌아가기
             }
@@ -381,7 +382,7 @@ public class GameUI {
         logMessage(chamberStatus+"\n");
     }
 
-    // MVP 투표 UI
+    // MVP 투표 UI 출력
     public void votePlayer() {
         CharacterTemplate voteCharacter = selectVote("제일 활약이 좋았던 플레이어를 고르세요.");
         String mvpPlayer = voteCharacter.getName();

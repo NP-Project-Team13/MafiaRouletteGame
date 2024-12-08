@@ -277,6 +277,7 @@ public class MafiaServer {
 
         broadcast(winner + "팀이 승리했습니다!");
 
+        // MVP 투표 시작 ~ 종료
         startVote();
         String mvpPlayer = voteCount();
         writeHistory(winner, mvpPlayer);
@@ -288,6 +289,7 @@ public class MafiaServer {
         }
     }
 
+    // MVP 투표 시작 후 모든 플레이어 투표 완료 시까지 대기
     private void startVote() {
         broadcast("MVP 투표를 시작합니다!");
 
@@ -313,6 +315,7 @@ public class MafiaServer {
         }
     }
 
+    // MVP 투표 결과 집계
     private String voteCount() {
         Map<String, Integer> votes = new HashMap<>();
         clients.forEach(client -> {
@@ -341,6 +344,7 @@ public class MafiaServer {
         return mvpPlayer;
     }
 
+    // 텍스트 파일에 게임 결과 작성
     private void writeHistory(String winningTeam, String mvpPlayer) {
         String filepath = "src/resources/history.txt";
         String history = "";
