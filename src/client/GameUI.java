@@ -24,6 +24,9 @@ public class GameUI {
     private List<Boolean> bulletPositions;
     private JTextField chatInputField; // 채팅 입력 필드
 
+    private JScrollPane logScrollPane; // 게임 로그 패널을 멤버 변수로 선언
+
+
     public GameUI(MafiaClient client) {
         this.client = client; // 클라이언트 인스턴스 초기화
         this.characters = new ArrayList<>();
@@ -65,8 +68,10 @@ public class GameUI {
         gameLog.setFont(new Font("Monospaced", Font.PLAIN, 16)); // 글씨 크기 증가
         gameLog.setBackground(new Color(30, 30, 30));
         gameLog.setForeground(Color.WHITE);
-        JScrollPane logScrollPane = new JScrollPane(gameLog);
+
+        logScrollPane = new JScrollPane(gameLog);
         logScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY), "Game Log"));
+
 
         playerInfoPanel = new JPanel();
         playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.Y_AXIS));
@@ -110,11 +115,31 @@ public class GameUI {
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
         if (characters.isEmpty()) {
-            JLabel tempInfo = new JLabel("플레이어 정보가 아직 로드되지 않았습니다.", SwingConstants.CENTER);
+            playerInfoPanel.setLayout(new GridBagLayout());
+            playerInfoPanel.setBackground(Color.BLACK);
+            playerInfoPanel.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight())); // 패널 크기를 창 크기에 맞춤
+
+            JLabel tempInfo = new JLabel("", SwingConstants.CENTER);
             tempInfo.setForeground(Color.WHITE);
-            playerInfoPanel.add(tempInfo);
+//            tempInfo.setFont(loadCustomFont("/resources/Stylish.ttf", 30));
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.CENTER;
+
+            playerInfoPanel.add(tempInfo, gbc);
+
+
+            typeText(tempInfo, "다른 플레이어가 로드될 때까지 기다려주세요!");
+
+
         } else {
             for (CharacterTemplate character : characters) {
+                // 모든 캐릭터가 로드되면 로그 창을 보이게 설정
+                playerInfoPanel.setPreferredSize(new Dimension(300, frame.getHeight())); // 패널 폭을 300픽셀로 설정
+                playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.Y_AXIS));
+
                 JPanel playerPanel = new JPanel();
                 playerPanel.setLayout(new GridBagLayout()); // GridBagLayout 사용
                 GridBagConstraints gbc = new GridBagConstraints();
@@ -352,6 +377,7 @@ public class GameUI {
     }
 
     private void updateGameState(ServerResponse response) {
+
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
 //        characterLog(response);
@@ -359,6 +385,7 @@ public class GameUI {
         // 현재 턴과 라운드 번호 업데이트
         currentPlayerIndex = response.getCurrentPlayerIndex();
         roundNumber = response.getRoundNumber();
+
         updateTurnLabel(); // 현재 턴 레이블 업데이트
         updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
     }
@@ -386,5 +413,19 @@ public class GameUI {
         if (mvpPlayer == null) return;
 
         client.sendVote(mvpPlayer);
+    }
+
+    private void typeText(JLabel label, String text) {
+        new Thread(() -> {
+            for (int i = 0; i <= text.length(); i++) {
+                final String subText = text.substring(0, i);
+                SwingUtilities.invokeLater(() -> label.setText(subText));
+                try {
+                    Thread.sleep(50); // 각 글자가 표시되는 속도 조절 (50밀리초)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
