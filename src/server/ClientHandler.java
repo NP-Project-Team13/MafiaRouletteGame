@@ -77,13 +77,13 @@ public class ClientHandler implements Runnable {
                 sendMessage("투표 완료: " + action.getTarget());
             }
             case "chat" -> {
-                ClientHandler sameTeam = MafiaServer.clients.stream()
+                List<ClientHandler> sameTeam = MafiaServer.clients.stream()
                         .filter(client -> client.getTeam().equals(this.getTeam()))
-                        .filter(client -> !client.getNickname().equals(this.getNickname()))
-                        .findFirst()
-                        .orElse(null);
-                sendMessage(this.getNickname() + ": " + action.getTarget());
-                sameTeam.sendMessage(this.getNickname() + ": " + action.getTarget());
+                        .collect(Collectors.toList());
+
+                for(ClientHandler client : sameTeam) {
+                    client.sendMessage(this.getNickname() + ": " + action.getTarget());
+                }
             }
             default -> sendMessage("알 수 없는 요청입니다: " + action.getAction());
         }
