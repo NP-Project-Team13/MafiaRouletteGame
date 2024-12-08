@@ -113,7 +113,7 @@ public class MainMenu {
                 textPane.setForeground(textColor);
                 textPane.setFont(new Font("Monospaced", Font.PLAIN, 14));
 
-                // 텍스트 내용 추가
+                // history.txt 파일을 읽어서 게임 히스토리 메뉴 표시
                 String filepath = "src/resources/history.txt";
                 StyledDocument doc = textPane.getStyledDocument();
                 SimpleAttributeSet normal = new SimpleAttributeSet();

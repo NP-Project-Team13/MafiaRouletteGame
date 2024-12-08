@@ -244,10 +244,21 @@ public class GameUI {
     }
 
     private CharacterTemplate selectTarget(String message) {
-        // isAlive()가 true인 캐릭터만 필터링
+        // 상대 플레이어의 팀을 가져옴
+        String teamToShow = characters.get(currentPlayerIndex).getTeam();
+
+        // isAlive()가 true인 캐릭터만 필터링하고, 팀이 다른 캐릭터만 포함
         List<CharacterTemplate> aliveCharacters = characters.stream()
-                .filter(CharacterTemplate::isAlive)
+                .filter(character -> character.isAlive() && !character.getTeam().equals(teamToShow)) // 팀이 다른 캐릭터
                 .collect(Collectors.toList());
+
+        // 힐러인 경우, 자신이 아닌 자기 팀을 가져옴
+        CharacterTemplate currentCharacter = characters.get(currentPlayerIndex);
+        if (currentCharacter instanceof Character6 && ((Character6) currentCharacter).isReady()) {aliveCharacters = characters.stream()
+                .filter(character -> character.isAlive() && character.getTeam().equals(teamToShow) && !character.getName().equals(currentCharacter.getName())) // 팀이 같은 캐릭터
+                .collect(Collectors.toList());
+        }
+
 
         // JOptionPane을 사용하여 대상 선택
         return (CharacterTemplate) JOptionPane.showInputDialog(
@@ -257,9 +268,10 @@ public class GameUI {
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 aliveCharacters.toArray(), // 필터링된 캐릭터 배열
-                aliveCharacters.get(0) // 기본 선택
+                aliveCharacters.isEmpty() ? null : aliveCharacters.get(0) // 기본 선택 (빈 리스트 체크)
         );
     }
+
 
     private CharacterTemplate selectVote(String message) {
         List<CharacterTemplate> Characters = characters.stream()
@@ -301,7 +313,7 @@ public class GameUI {
         switch (response.getAction()) {
             case "updateGameState" -> updateGameState(response); // 게임 상태 업데이트 메소드 호출
             case "message" -> {
-                if (response.getMessage().equalsIgnoreCase("voteStart")) {
+                if (response.getMessage().equalsIgnoreCase("voteStart")) { // 투표 시작
                     votePlayer();
                 } else {
                     logMessage(response.getMessage());
@@ -317,8 +329,9 @@ public class GameUI {
             }
             case "useAbility" -> {
                 logMessage(response.getMessage());
+                updateGameState(response); // useAbility시 턴이 바뀌지 않아 updateGameState가 한 번 호출됨
             }
-            case "voteEnd" -> {
+            case "voteEnd" -> { // 투표 종료
                 String mvp = response.getMessage();
                 JOptionPane.showMessageDialog(frame,
                         "투표 결과 MVP 플레이어는 " + mvp + "로 선정되었습니다!",
@@ -343,6 +356,16 @@ public class GameUI {
     private void updateGameState(ServerResponse response) {
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
+//        characterLog(response);
+
+        // 현재 턴과 라운드 번호 업데이트
+        currentPlayerIndex = response.getCurrentPlayerIndex();
+        roundNumber = response.getRoundNumber();
+        updateTurnLabel(); // 현재 턴 레이블 업데이트
+        updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
+    }
+
+    private void characterLog(ServerResponse response) {
         logMessage("\n\n");
         for (CharacterTemplate character : characters) {
             logMessage("   📍 [" + character.getTeam() + "팀] " + (character.isAlive() ? "생존자 " : "사망자 ") + character.getName() +
@@ -356,14 +379,9 @@ public class GameUI {
                 .map(bulletPosition -> " " + (bulletPosition ? "O " : "X "))
                 .collect(Collectors.joining("", "\uD83D\uDCA1총알 슬롯 상태: " + "슬롯 ", ""));
         logMessage(chamberStatus+"\n");
-
-        // 현재 턴과 라운드 번호 업데이트
-        currentPlayerIndex = response.getCurrentPlayerIndex();
-        roundNumber = response.getRoundNumber();
-        updateTurnLabel(); // 현재 턴 레이블 업데이트
-        updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
     }
 
+    // MVP 투표 UI
     public void votePlayer() {
         CharacterTemplate voteCharacter = selectVote("제일 활약이 좋았던 플레이어를 고르세요.");
         String mvpPlayer = voteCharacter.getName();
