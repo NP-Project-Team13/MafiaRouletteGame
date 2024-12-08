@@ -91,6 +91,7 @@ public class MafiaClient {
         out.flush();
     }
 
+    // 서버로 투표 결과 전송
     public void sendVote(String player) {
         ClientAction action = new ClientAction("vote", player);
         out.println(JsonUtil.actionToJson(action));
