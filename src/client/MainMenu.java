@@ -109,6 +109,7 @@ public class MainMenu {
                 // 텍스트 출력 영역 (JTextPane)
                 JTextPane textPane = new JTextPane();
                 textPane.setEditable(false);
+                textPane.setCaret(null);
                 textPane.setBackground(backgroundColor);
                 textPane.setForeground(textColor);
                 textPane.setFont(new Font("Monospaced", Font.PLAIN, 14));

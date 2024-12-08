@@ -2,6 +2,8 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import characters.CharacterTemplate;
 import client.ClientAction;
@@ -73,6 +75,15 @@ public class ClientHandler implements Runnable {
             case "vote" -> {
                 setVote(action.getTarget());
                 sendMessage("투표 완료: " + action.getTarget());
+            }
+            case "chat" -> {
+                List<ClientHandler> sameTeam = MafiaServer.clients.stream()
+                        .filter(client -> client.getTeam().equals(this.getTeam()))
+                        .collect(Collectors.toList());
+
+                for(ClientHandler client : sameTeam) {
+                    client.sendMessage(this.getNickname() + ": " + action.getTarget());
+                }
             }
             default -> sendMessage("알 수 없는 요청입니다: " + action.getAction());
         }
