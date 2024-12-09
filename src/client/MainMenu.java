@@ -244,39 +244,9 @@ public class MainMenu {
         String description;
         String imagePath = "/resources/character.jpg";
 
-//        if (character instanceof Character1) {
-//            description = "<html><h2>캐릭터1: 총알의 위치를 확인하는 능력</h2>"
-//                    + "<p>언제든지 비동기적으로 총알의 위치를 확인할 수 있습니다.<br>"
-//                    + "능력을 사용하면 즉시 총알이 어느 슬롯에 있는지 확인할 수 있습니다.<br>"
-//                    + "라운드마다 능력 사용 가능 상태가 초기화되며, 매 라운드마다 사용 가능합니다.</p></html>";
-//        } else if (character instanceof Character2) {
-//            description = "<html><h2>캐릭터2: 총알을 튕겨내는 방어 능력</h2>"
-//                    + "<p>언제든지 비동기적으로 총알을 튕겨낼 준비를 할 수 있습니다.<br>"
-//                    + "총에 맞을 경우 자동으로 총알을 튕겨냅니다.<br>"
-//                    + "라운드마다 능력 사용 가능 상태가 초기화되며, 매 라운드마다 사용 가능합니다.</p></html>";
-//        } else if (character instanceof Character3) {
-//            description = "<html><h2>캐릭터3: 무작위 생존 결정 능력</h2>"
-//                    + "<p>50:50 확률로 자신과 상대 중 한 명이 사망합니다.<br>"
-//                    + "라운드마다 능력 사용 가능 상태가 초기화되며, 매 라운드마다 사용 가능합니다.</p></html>";
-//        } else if (character instanceof Character4) {
-//            description = "<html><h2>캐릭터4: 기관총 발사 능력</h2>"
-//                    + "<p>기관총을 발사하여 적 전체를 공격합니다.<br>"
-//                    + "총알이 없으면 턴이 종료됩니다.<br>"
-//                    + "라운드마다 사용 가능합니다.</p></html>";
-//        } else if (character instanceof Character5) {
-//            description = "<html><h2>캐릭터5: 데미지 2배 능력</h2>"
-//                    + "<p>상대가 총에 맞을 때 데미지를 2배로 줍니다.<br>"
-//                    + "게임 중 1회만 사용 가능합니다.</p></html>";
-//        } else if (character instanceof Character6) {
-//            description = "<html><h2>캐릭터6: 힐러 능력</h2>"
-//                    + "<p>자신의 체력을 소모해 아군을 치료할 수 있습니다.<br>"
-//                    + "라운드마다 사용 가능합니다.</p></html>";
-//        } else {
-//            description = "<html><h2>알 수 없는 캐릭터입니다.</h2></html>";
-//        }
         if (character instanceof Character1) {
             description = "<html>"
-                    + "<h2>캐릭터1: 총알의 위치를 확인하는 능력</h2>"
+                    + "<h2>[총알의 위치를 확인하는 능력]</h2>"
                     + "<p>이 능력은 총알이 어느 슬롯에 있는지 확인할 수 있는 능력입니다.</p>"
                     + "<ul>"
                     + "<li><b>능력 설명:</b> 비동기적으로 총알의 위치를 확인합니다.</li>"
@@ -287,18 +257,18 @@ public class MainMenu {
                     + "</html>";
         } else if (character instanceof Character2) {
             description = "<html>"
-                    + "<h2>캐릭터2: 총알을 튕겨내는 방어 능력</h2>"
+                    + "<h2>[총알을 튕겨내는 방어 능력]</h2>"
                     + "<p>총에 맞을 때 자동으로 총알을 튕겨내는 방어형 능력입니다.</p>"
                     + "<ul>"
                     + "<li><b>능력 설명:</b> 비동기적으로 방어 태세를 준비하고, 총에 맞으면 자동으로 총알을 튕겨냅니다.</li>"
                     + "<li><b>사용 방법:</b> 방어 준비를 완료한 후, 공격받을 경우 자동으로 발동합니다.</li>"
                     + "<li><b>쿨다운:</b> 라운드마다 초기화되므로, 매 라운드마다 다시 준비할 수 있습니다.</li>"
-                    + "<li><b>제약 사항:</b> 준비 상태에서만 발동되며, 준비하지 않으면 방어할 수 없습니다.</li>"
+                    + "<li><b>제약 사항:</b> 능력 사용 버튼을 눌러 준비 상태가 되어야만 발동되며, 준비하지 않으면 방어할 수 없습니다.</li>"
                     + "</ul>"
                     + "</html>";
         } else if (character instanceof Character3) {
             description = "<html>"
-                    + "<h2>캐릭터3: 무작위 생존 결정 능력</h2>"
+                    + "<h2>[무작위 생존 결정 능력]</h2>"
                     + "<p>50:50 확률로 자신과 상대 중 한 명이 사망하는 도박성 능력입니다.</p>"
                     + "<ul>"
                     + "<li><b>능력 설명:</b> 자신과 상대 중 한 명이 무작위로 선택되어 사망합니다.</li>"
@@ -309,18 +279,18 @@ public class MainMenu {
                     + "</html>";
         } else if (character instanceof Character4) {
             description = "<html>"
-                    + "<h2>캐릭터4: 기관총 발사 능력</h2>"
+                    + "<h2>[기관총 발사 능력]</h2>"
                     + "<p>기관총을 발사해 적 전체를 공격하는 강력한 공격형 능력입니다.</p>"
                     + "<ul>"
                     + "<li><b>능력 설명:</b> 기관총을 발사하여 적 전체에게 피해를 줍니다.</li>"
-                    + "<li><b>사용 조건:</b> 총알이 있어야 능력이 발동됩니다. 총알이 없으면 턴이 종료됩니다.</li>"
+                    + "<li><b>사용 조건:</b> 능력 사용시, 준비 상태가 되며 총알이 있어야 능력이 발동됩니다. 총알이 없어도 능력 사용으로 간주되며, 턴이 넘어갑니다.</li>"
                     + "<li><b>쿨다운:</b> 라운드마다 초기화되며, 매 라운드마다 사용할 수 있습니다.</li>"
                     + "<li><b>전략 포인트:</b> 적의 수가 많을 때 유리하며, 적 전체에 큰 피해를 줄 수 있습니다.</li>"
                     + "</ul>"
                     + "</html>";
         } else if (character instanceof Character5) {
             description = "<html>"
-                    + "<h2>캐릭터5: 데미지 2배 능력</h2>"
+                    + "<h2>[데미지 2배 능력]</h2>"
                     + "<p>상대에게 입히는 데미지를 두 배로 증가시키는 결정적 능력입니다.</p>"
                     + "<ul>"
                     + "<li><b>능력 설명:</b> 총에 맞은 상대에게 데미지를 2배로 줍니다.</li>"
@@ -330,7 +300,7 @@ public class MainMenu {
                     + "</html>";
         } else if (character instanceof Character6) {
             description = "<html>"
-                    + "<h2>캐릭터6: 힐러 능력</h2>"
+                    + "<h2>[힐러 능력]</h2>"
                     + "<p>자신의 체력을 소모하여 아군의 체력을 회복할 수 있는 지원형 능력입니다.</p>"
                     + "<ul>"
                     + "<li><b>능력 설명:</b> 자신의 체력을 1 소모하고, 아군의 체력을 1 회복시킵니다.</li>"
