@@ -237,8 +237,15 @@ public class GameUI {
         // Character가 힐러일 때
         if (character instanceof Character6) {
             Character6 character6 = (Character6) character;
-            if (character6.isReady()) {
+            // 다른 아군의 생존 여부 확인
+            boolean hasAliveAlly = characters.stream()
+                    .anyMatch(c -> c.isAlive() && c.getTeam().equals(character6.getTeam()) && !c.getName().equals(character6.getName()));
+
+            if (character6.isReady() && hasAliveAlly) {
                 shootButton.setText("Heal"); // 버튼의 텍스트를 "Heal"로 변경
+            } else {
+                character6.setReady(false); // 힐을 준비한 상태를 false로 변경
+                updateCharacterInList(character6); // 리스트에 반영
             }
         }
 
@@ -641,6 +648,15 @@ public class GameUI {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+
+    private void updateCharacterInList(CharacterTemplate updatedCharacter) {
+        for (int i = 0; i < characters.size(); i++) {
+            if (characters.get(i).getName().equals(updatedCharacter.getName())) {
+                characters.set(i, updatedCharacter);
+                break;
+            }
+        }
+    }
 
 
 }
