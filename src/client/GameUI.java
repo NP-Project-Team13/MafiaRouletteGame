@@ -260,20 +260,20 @@ public class GameUI {
 
     private void useAbility(CharacterTemplate currentCharacter) {
         if (currentCharacter.isAbilityUsed()) {
-            logMessage(currentCharacter.getName() + "은(는) 이미 능력을 사용했습니다.");
+            logMessage(currentCharacter.getName() + "님은 이미 능력을 사용했습니다.");
             return;
         }
 
         // 서버에 능력 사용 요청 전송
         client.sendAbilityRequest(currentCharacter);
 
-        logMessage(currentCharacter.getName() + "이(가) 능력을 사용했습니다.");
+        logMessage(currentCharacter.getName() + "님이 능력을 사용했습니다.");
     }
 
     private void updateTurnLabel() {
         Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 35f); // 원하는 크기로 설정
         turnLabel.setFont(dokdoFont);
-        turnLabel.setText("현재 턴: " + characters.get(currentPlayerIndex).getName() + " | 라운드: " + roundNumber);
+        turnLabel.setText("[현재 턴] " + characters.get(currentPlayerIndex) + "  [라운드] " + roundNumber);
     }
 
 
@@ -294,35 +294,121 @@ public class GameUI {
         }
 
 
-        // JOptionPane을 사용하여 대상 선택
-        return (CharacterTemplate) JOptionPane.showInputDialog(
-                null,
-                message,
-                "대상 선택",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                aliveCharacters.toArray(), // 필터링된 캐릭터 배열
-                aliveCharacters.isEmpty() ? null : aliveCharacters.get(0) // 기본 선택 (빈 리스트 체크)
-        );
+        // 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "타겟 선택", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 라벨 추가
+        JLabel messageLabel = new JLabel(message);
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(messageLabel, gbc);
+
+        // 캐릭터 선택 드롭다운
+        JComboBox<CharacterTemplate> targetComboBox = new JComboBox<>(aliveCharacters.toArray(new CharacterTemplate[0]));
+        targetComboBox.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        gbc.gridy = 1;
+        dialog.add(targetComboBox, gbc);
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        // 확인 버튼
+        JButton confirmButton = new JButton("확인");
+        styleButton(confirmButton);
+        confirmButton.addActionListener(e -> dialog.dispose());
+
+        // 취소 버튼
+        JButton cancelButton = new JButton("취소");
+        styleButton(cancelButton);
+        cancelButton.addActionListener(e -> {
+            targetComboBox.setSelectedItem(null);
+            dialog.dispose();
+        });
+
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+
+        gbc.gridy = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.setVisible(true);
+
+        return (CharacterTemplate) targetComboBox.getSelectedItem();
     }
 
 
     // MVP 플레이어 선택 창
     private CharacterTemplate selectVote(String message) {
-        List<CharacterTemplate> Characters = characters.stream()
-                .collect(Collectors.toList());
+        // 새로운 커스텀 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "MVP 투표", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(Color.WHITE);
 
-        // JOptionPane을 사용하여 대상 선택
-        return (CharacterTemplate) JOptionPane.showInputDialog(
-                null,
-                message,
-                "MVP 투표",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                Characters.toArray(), // 필터링된 캐릭터 배열
-                Characters.get(0) // 기본 선택
-        );
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 라벨 추가
+        JLabel messageLabel = new JLabel(message);
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(messageLabel, gbc);
+
+        // 플레이어 선택 드롭다운
+        List<CharacterTemplate> charactersList = characters.stream().collect(Collectors.toList());
+        JComboBox<CharacterTemplate> characterComboBox = new JComboBox<>(charactersList.toArray(new CharacterTemplate[0]));
+        characterComboBox.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        dialog.add(characterComboBox, gbc);
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        // 확인 버튼
+        JButton confirmButton = new JButton("확인");
+        styleButton(confirmButton);
+        confirmButton.addActionListener(e -> dialog.dispose());
+
+        // 취소 버튼
+        JButton cancelButton = new JButton("취소");
+        styleButton(cancelButton);
+        cancelButton.addActionListener(e -> {
+            characterComboBox.setSelectedItem(null);
+            dialog.dispose();
+        });
+
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+
+        gbc.gridy = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.setVisible(true);
+
+        return (CharacterTemplate) characterComboBox.getSelectedItem();
     }
+
     public void logMessage(String message) {
         gameLog.append(message + "\n");
         gameLog.setCaretPosition(gameLog.getDocument().getLength()); // 자동 스크롤
@@ -418,7 +504,7 @@ public class GameUI {
             case "voteEnd" -> { // 투표 종료
                 String mvp = response.getMessage();
                 JOptionPane.showMessageDialog(frame,
-                        "투표 결과 MVP 플레이어는 " + mvp + "로 선정되었습니다!",
+                        "투표 결과 MVP 플레이어는 " + mvp + "님으로 선정되었습니다!",
                         "MVP 투표 완료", JOptionPane.INFORMATION_MESSAGE);
                 logMessage("3초 후 메인 화면으로 돌아갑니다...");
                 try {

@@ -15,26 +15,26 @@ public class Character3 extends CharacterTemplate {
     public String shoot(CharacterTemplate target) {
         StringBuilder result = new StringBuilder();
         if (health <= 0) { // 자신
-            result.append(name).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
+            result.append(name).append("님은 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if (target.getHealth() <= 0) { // 상대
-            result.append(target.getName()).append("은(는) 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
+            result.append(target.getName()).append("님은 이미 사망했기 때문에 총을 쏠 수 없습니다.\n");
             return result.toString();
         }
         if(!isReady){
-            result.append(name).append("이(가) ").append(target.getName()).append("에게 총을 발사하여 적중시켰습니다!✅\n");
+            result.append(name).append("님이 ").append(target.getName()).append("님에게 총을 발사하여 적중시켰습니다!✅\n");
             result.append(target.receiveDamage());
         } else {
-            result.append("\n").append(name).append("은(는) ").append(target.getName())
-                    .append("과(와) 함께 대박 아니면 쪽박 능력이 적용됩니다.\n");
+            result.append("\n").append(name).append("님은 ").append(target.getName())
+                    .append("님과 함께 대박 아니면 쪽박 능력이 적용됩니다.\n");
             if (new Random().nextBoolean()) {
-                result.append("\n").append(name).append("은(는) 죽음의 도박에서 살아남았습니다.\n")
-                        .append(target.getName()).append("은(는) 사망하였습니다.\n");
+                result.append("\n").append(name).append("님은 죽음의 도박에서 살아남았습니다.\n")
+                        .append(target.getName()).append("님은 사망했습니다☠️.\n");
                 target.health = 0;
             } else {
-                result.append("\n").append(target.getName()).append("은(는) 죽음의 도박에서 살아남았습니다.\n")
-                        .append(name).append("은(는) 사망하였습니다.\n");
+                result.append("\n").append(target.getName()).append("님은 죽음의 도박에서 살아남았습니다.\n")
+                        .append(name).append("님은 사망했습니다.\n");
                 this.health = 0;
             }
         }
@@ -45,16 +45,16 @@ public class Character3 extends CharacterTemplate {
     public String useAbility() {
         StringBuilder result = new StringBuilder();
         if (health <= 0) {
-            result.append(name).append("은(는) 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
+            result.append(name).append("님은 이미 사망했기 때문에 능력을 사용할 수 없습니다.\n");
             return result.toString();
         }
         if (isAbilityUsed) {
-            result.append(name).append("은(는) 이미 이번 라운드에서 능력을 사용했습니다.\n");
+            result.append(name).append("님은 이미 이번 라운드에서 능력을 사용했습니다.\n");
             return result.toString();
         }
         setAbilityUsed(true);
         isReady = true;
-        result.append(name).append("은(는) 대박 아니면 쪽박 능력을 사용할 준비가 되었습니다.\n");
+        result.append(name).append("님은 나 아니면 너 OUT 능력을 사용할 준비가 되었습니다.\n");
         return result.toString();
     }
 
