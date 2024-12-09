@@ -8,6 +8,9 @@ import server.ServerResponse;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -492,7 +495,11 @@ public class GameUI {
             case "message" -> { // 메시지 전송
                 if (response.getMessage().equalsIgnoreCase("voteStart")) { // 투표 시작
                     votePlayer();
-                } else {
+                }else if(response.getMessage().startsWith("history:")) {
+                    String history = response.getMessage().substring("history:".length());
+                    saveHistoryToFile(history);
+                }
+                else {
                     logMessage(response.getMessage());
                 }
             }
@@ -525,6 +532,16 @@ public class GameUI {
 
             // 추가적인 응답 처리 로직
             default -> logMessage("알 수 없는 행동: " + response.getAction());
+        }
+    }
+
+    private void saveHistoryToFile(String history) {
+        String filePath = "resources/history.txt";
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+            writer.println(history); // history 기록 저장
+            System.out.println("게임 기록이 저장되었습니다: " + history);
+        } catch (IOException e) {
+            System.err.println("기록 저장 실패: " + e.getMessage());
         }
     }
 

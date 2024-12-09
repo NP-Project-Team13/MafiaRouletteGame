@@ -206,6 +206,7 @@ public class MafiaServer {
                 .orElse(null);
 
         // shooter가 Character6이고, 같은 팀에 죽은 플레이어가 있는지 확인
+        // 힐러인 경우 Heal 능력이 비활성화 되어야 하기 때문에 로직 추가
         if (shooter.getCharacter() instanceof Character6) {
             boolean isTeammateDead = clients.stream()
                     .filter(client -> client != shooter) // shooter 자신 제외
@@ -388,7 +389,11 @@ public class MafiaServer {
             // 포맷팅된 문자열로 변환
             String formattedDate = currentDate.format(formatter);
             history += formattedDate + " " + teamA.get(0) + " " + teamA.get(1) + " " + teamB.get(0) + " " + teamB.get(1) + " " + winningTeam + " " + mvpPlayer;
-            pw.println(history);
+            //pw.println(history);
+
+            for(ClientHandler client : clients){
+                client.sendMessage("history: "+history);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
