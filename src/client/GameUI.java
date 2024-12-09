@@ -53,14 +53,17 @@ public class GameUI {
         topPanel.setOpaque(false);
 
         JButton backButton = new JButton("뒤로가기");
-        backButton.setFont(new Font("Serif", Font.BOLD, 16));
+        backButton.setFont(new Font("나눔 고딕", Font.BOLD, 16));
         backButton.setBackground(new Color(80, 80, 80));
-        backButton.setForeground(Color.WHITE);
+        backButton.setForeground(Color.GRAY);
         backButton.addActionListener(e -> goBack(frame));
 
+        // 커스텀 폰트 불러오기
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 28f);
         turnLabel = new JLabel("게임 대기중", SwingConstants.CENTER);
-        turnLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        turnLabel.setFont(dokdoFont); // 불러온 커스텀 폰트 적용
         turnLabel.setForeground(Color.RED);
+
 
         topPanel.add(backButton, BorderLayout.WEST);
         topPanel.add(turnLabel, BorderLayout.CENTER);
@@ -185,7 +188,7 @@ public class GameUI {
                 // 능력 정보
                 JLabel playerInfo2 = new JLabel(String.format(" [능력] %s", character.getInfo()));
                 playerInfo2.setForeground(Color.WHITE); // 글씨 색상 흰색
-                playerInfo2.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
+                playerInfo2.setFont(new Font("나눔 고딕", Font.BOLD, 16)); // 글씨 크기 증가
 
                 gbc.gridx = 0;
                 gbc.gridy = 2;
@@ -257,19 +260,22 @@ public class GameUI {
 
     private void useAbility(CharacterTemplate currentCharacter) {
         if (currentCharacter.isAbilityUsed()) {
-            logMessage(currentCharacter.getName() + "은(는) 이미 능력을 사용했습니다.");
+            logMessage(currentCharacter.getName() + "님은 이미 능력을 사용했습니다.");
             return;
         }
 
         // 서버에 능력 사용 요청 전송
         client.sendAbilityRequest(currentCharacter);
 
-        logMessage(currentCharacter.getName() + "이(가) 능력을 사용했습니다.");
+        logMessage(currentCharacter.getName() + "님이 능력을 사용했습니다.");
     }
 
     private void updateTurnLabel() {
-        turnLabel.setText("현재 턴: " + characters.get(currentPlayerIndex).getName() + " | 라운드: " + roundNumber);
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 35f); // 원하는 크기로 설정
+        turnLabel.setFont(dokdoFont);
+        turnLabel.setText("[현재 턴] " + characters.get(currentPlayerIndex) + "  [라운드] " + roundNumber);
     }
+
 
     private CharacterTemplate selectTarget(String message) {
         // 상대 플레이어의 팀을 가져옴
@@ -288,35 +294,121 @@ public class GameUI {
         }
 
 
-        // JOptionPane을 사용하여 대상 선택
-        return (CharacterTemplate) JOptionPane.showInputDialog(
-                null,
-                message,
-                "대상 선택",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                aliveCharacters.toArray(), // 필터링된 캐릭터 배열
-                aliveCharacters.isEmpty() ? null : aliveCharacters.get(0) // 기본 선택 (빈 리스트 체크)
-        );
+        // 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "타겟 선택", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 라벨 추가
+        JLabel messageLabel = new JLabel(message);
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(messageLabel, gbc);
+
+        // 캐릭터 선택 드롭다운
+        JComboBox<CharacterTemplate> targetComboBox = new JComboBox<>(aliveCharacters.toArray(new CharacterTemplate[0]));
+        targetComboBox.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        gbc.gridy = 1;
+        dialog.add(targetComboBox, gbc);
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        // 확인 버튼
+        JButton confirmButton = new JButton("확인");
+        styleButton(confirmButton);
+        confirmButton.addActionListener(e -> dialog.dispose());
+
+        // 취소 버튼
+        JButton cancelButton = new JButton("취소");
+        styleButton(cancelButton);
+        cancelButton.addActionListener(e -> {
+            targetComboBox.setSelectedItem(null);
+            dialog.dispose();
+        });
+
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+
+        gbc.gridy = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.setVisible(true);
+
+        return (CharacterTemplate) targetComboBox.getSelectedItem();
     }
 
 
     // MVP 플레이어 선택 창
     private CharacterTemplate selectVote(String message) {
-        List<CharacterTemplate> Characters = characters.stream()
-                .collect(Collectors.toList());
+        // 새로운 커스텀 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "MVP 투표", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(Color.WHITE);
 
-        // JOptionPane을 사용하여 대상 선택
-        return (CharacterTemplate) JOptionPane.showInputDialog(
-                null,
-                message,
-                "MVP 투표",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                Characters.toArray(), // 필터링된 캐릭터 배열
-                Characters.get(0) // 기본 선택
-        );
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 라벨 추가
+        JLabel messageLabel = new JLabel(message);
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(messageLabel, gbc);
+
+        // 플레이어 선택 드롭다운
+        List<CharacterTemplate> charactersList = characters.stream().collect(Collectors.toList());
+        JComboBox<CharacterTemplate> characterComboBox = new JComboBox<>(charactersList.toArray(new CharacterTemplate[0]));
+        characterComboBox.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        dialog.add(characterComboBox, gbc);
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        // 확인 버튼
+        JButton confirmButton = new JButton("확인");
+        styleButton(confirmButton);
+        confirmButton.addActionListener(e -> dialog.dispose());
+
+        // 취소 버튼
+        JButton cancelButton = new JButton("취소");
+        styleButton(cancelButton);
+        cancelButton.addActionListener(e -> {
+            characterComboBox.setSelectedItem(null);
+            dialog.dispose();
+        });
+
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+
+        gbc.gridy = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.setVisible(true);
+
+        return (CharacterTemplate) characterComboBox.getSelectedItem();
     }
+
     public void logMessage(String message) {
         gameLog.append(message + "\n");
         gameLog.setCaretPosition(gameLog.getDocument().getLength()); // 자동 스크롤
@@ -411,9 +503,7 @@ public class GameUI {
             }
             case "voteEnd" -> { // 투표 종료
                 String mvp = response.getMessage();
-                JOptionPane.showMessageDialog(frame,
-                        "투표 결과 MVP 플레이어는 " + mvp + "로 선정되었습니다!",
-                        "MVP 투표 완료", JOptionPane.INFORMATION_MESSAGE);
+                showMVPDialog(mvp);
                 logMessage("3초 후 메인 화면으로 돌아갑니다...");
                 try {
                     Thread.sleep(3000);
@@ -471,10 +561,15 @@ public class GameUI {
     }
 
     private void typeText(JLabel label, String text) {
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 40f);
+
         new Thread(() -> {
             for (int i = 0; i <= text.length(); i++) {
                 final String subText = text.substring(0, i);
-                SwingUtilities.invokeLater(() -> label.setText(subText));
+                SwingUtilities.invokeLater(() -> {
+                    label.setFont(dokdoFont);
+                    label.setText(subText);
+                });
                 try {
                     Thread.sleep(50); // 각 글자가 표시되는 속도 조절 (50밀리초)
                 } catch (InterruptedException e) {
@@ -483,6 +578,7 @@ public class GameUI {
             }
         }).start();
     }
+
 
     public CharacterTemplate getAssignedCharacter(String nickname) {
         // 현재 플레이어 리스트에서 닉네임과 일치하는 캐릭터를 반환
@@ -493,5 +589,57 @@ public class GameUI {
         }
         return null; // 일치하는 캐릭터가 없을 경우 null 반환
     }
+
+    private Font loadCustomFont(String path, float size) {
+        try {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream(path));
+            return font.deriveFont(size);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Font("나눔 고딕", Font.PLAIN, (int) size); // 기본 폰트로 대체
+        }
+    }
+
+    private void showMVPDialog(String mvpPlayer) {
+
+        // 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "🎉 MVP 선정 🎉", true);
+        dialog.setSize(400, 200);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(new Color(255, 240, 200)); // 따뜻한 배경색
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 메시지 라벨
+        JLabel messageLabel = new JLabel("투표 결과 MVP는 " + mvpPlayer + "님입니다!");
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        dialog.add(messageLabel, gbc);
+
+        // 확인 버튼
+        JButton okButton = new JButton("확인");
+        styleMVPButton(okButton);
+        okButton.addActionListener(e -> dialog.dispose());
+        gbc.gridy = 1;
+        dialog.add(okButton, gbc);
+
+        dialog.setVisible(true);
+    }
+
+    private void styleMVPButton(JButton button) {
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+        button.setPreferredSize(new Dimension(100, 40));
+        button.setFocusPainted(false);
+        button.setBackground(Color.WHITE);
+        button.setForeground(Color.BLACK);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+
 
 }

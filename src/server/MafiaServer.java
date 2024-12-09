@@ -102,14 +102,13 @@ public class MafiaServer {
     private void startGame() {
         while (true) {
             // 라운드 시작 브로드캐스트
-            broadcast("💎💎💎 라운드 " + currentRound + " 시작 💎💎💎");
-
+            broadcast("---------------------------------- 라운드 " + currentRound + " 시작 ----------------------------------");
             // 모든 플레이어의 턴 진행
             for (int i = 0; i < clients.size(); i++) {
                 ClientHandler currentPlayer = clients.get(currentTurnIndex);
 
                 if(!currentPlayer.getCharacter().isAlive()){
-                    System.out.println(currentPlayer.getNickname() + "은(는) 사망했습니다. 턴을 건너뜁니다.");
+                    System.out.println(currentPlayer.getNickname() + "님은 사망했습니다. 턴을 건너뜁니다.");
                     currentTurnIndex = (currentTurnIndex + 1) % clients.size();
                     continue;
                 }
@@ -219,7 +218,7 @@ public class MafiaServer {
             message = shooter.getCharacter().shoot(target.getCharacter());
         } else {
             action = "miss";
-            message = shooter.getNickname() + "이(가) " + targetNickname + "을(를) 빗맞췄습니다!❌";
+            message = shooter.getNickname() + "님이 " + targetNickname + "님을 빗맞췄습니다!❌";
         }
 
         ServerResponse response = new ServerResponse(action, message, collectCharacters(), Gun.getChambers(), currentRound, currentTurnIndex);
@@ -338,9 +337,9 @@ public class MafiaServer {
             System.out.print("Key : " + key);
             System.out.println(", Val : " + votes.get(key));
         }
-        System.out.println("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+        System.out.println("투표 결과 MVP 플레이어는 " + mvpPlayer + "님으로 선정되었습니다!");
 
-        broadcast("투표 결과 MVP 플레이어는 " + mvpPlayer + "로 선정되었습니다!");
+        broadcast("투표 결과 MVP 플레이어는 " + mvpPlayer + "님으로 선정되었습니다!");
         for (ClientHandler client : clients) {
             client.sendResponse(new ServerResponse("voteEnd", mvpPlayer)); // client에 투표 전달
         }
