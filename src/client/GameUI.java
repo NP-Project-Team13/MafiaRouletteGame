@@ -503,9 +503,7 @@ public class GameUI {
             }
             case "voteEnd" -> { // 투표 종료
                 String mvp = response.getMessage();
-                JOptionPane.showMessageDialog(frame,
-                        "투표 결과 MVP 플레이어는 " + mvp + "님으로 선정되었습니다!",
-                        "MVP 투표 완료", JOptionPane.INFORMATION_MESSAGE);
+                showMVPDialog(mvp);
                 logMessage("3초 후 메인 화면으로 돌아갑니다...");
                 try {
                     Thread.sleep(3000);
@@ -601,6 +599,48 @@ public class GameUI {
             return new Font("나눔 고딕", Font.PLAIN, (int) size); // 기본 폰트로 대체
         }
     }
+
+    private void showMVPDialog(String mvpPlayer) {
+
+        // 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "🎉 MVP 선정 🎉", true);
+        dialog.setSize(400, 200);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(new Color(255, 240, 200)); // 따뜻한 배경색
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 메시지 라벨
+        JLabel messageLabel = new JLabel("투표 결과 MVP는 " + mvpPlayer + "님입니다!");
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+        messageLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        dialog.add(messageLabel, gbc);
+
+        // 확인 버튼
+        JButton okButton = new JButton("확인");
+        styleMVPButton(okButton);
+        okButton.addActionListener(e -> dialog.dispose());
+        gbc.gridy = 1;
+        dialog.add(okButton, gbc);
+
+        dialog.setVisible(true);
+    }
+
+    private void styleMVPButton(JButton button) {
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+        button.setPreferredSize(new Dimension(100, 40));
+        button.setFocusPainted(false);
+        button.setBackground(new Color(50, 150, 250));
+        button.setForeground(Color.BLACK);
+        button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
 
 
 }
