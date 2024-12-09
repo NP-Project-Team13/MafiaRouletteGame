@@ -1,5 +1,6 @@
 package client;
 
+import characters.*;
 import client.MafiaClient;
 
 import javax.imageio.ImageIO;
@@ -72,6 +73,7 @@ public class MainMenu {
 
         // 버튼 이벤트
         startButton.addActionListener(e -> {
+            // 게임 시작
             frame.dispose();
             gameUI.createAndShowGUI();
             client.sendReady();
@@ -181,9 +183,9 @@ public class MainMenu {
                 // 새 창 위치 및 표시
                 historyPopup.setLocationRelativeTo(null);
                 historyPopup.setVisible(true);
+
             }
         });
-
 
 
         exitButton.addActionListener(e -> System.exit(0));
@@ -237,4 +239,148 @@ public class MainMenu {
 
         return button;
     }
+
+    public static void showCharacterDescriptions(CharacterTemplate character) {
+        String description;
+        String imagePath = "/resources/character.jpg";
+
+        if (character instanceof Character1) {
+            description = "<html>"
+                    + "<h2>[총알의 위치를 확인하는 능력]</h2>"
+                    + "<p>이 능력은 총알이 어느 슬롯에 있는지 확인할 수 있는 능력입니다.</p>"
+                    + "<ul>"
+                    + "<li><b>능력 설명:</b> 비동기적으로 총알의 위치를 확인합니다.</li>"
+                    + "<li><b>사용 방법:</b> 능력을 활성화하면, 즉시 총알이 장전된 슬롯의 위치를 확인할 수 있습니다.</li>"
+                    + "<li><b>쿨다운:</b> 라운드가 시작될 때마다 능력 사용 상태가 초기화되므로, 매 라운드마다 다시 사용 가능합니다.</li>"
+                    + "<li><b>전략 포인트:</b> 적의 총알 패턴을 파악하여 방어 전략을 세울 수 있습니다.</li>"
+                    + "</ul>"
+                    + "</html>";
+        } else if (character instanceof Character2) {
+            description = "<html>"
+                    + "<h2>[총알을 튕겨내는 방어 능력]</h2>"
+                    + "<p>총에 맞을 때 자동으로 총알을 튕겨내는 방어형 능력입니다.</p>"
+                    + "<ul>"
+                    + "<li><b>능력 설명:</b> 비동기적으로 방어 태세를 준비하고, 총에 맞으면 자동으로 총알을 튕겨냅니다.</li>"
+                    + "<li><b>사용 방법:</b> 방어 준비를 완료한 후, 공격받을 경우 자동으로 발동합니다.</li>"
+                    + "<li><b>쿨다운:</b> 라운드마다 초기화되므로, 매 라운드마다 다시 준비할 수 있습니다.</li>"
+                    + "<li><b>제약 사항:</b> 능력 사용 버튼을 눌러 준비 상태가 되어야만 발동되며, 준비하지 않으면 방어할 수 없습니다.</li>"
+                    + "</ul>"
+                    + "</html>";
+        } else if (character instanceof Character3) {
+            description = "<html>"
+                    + "<h2>[무작위 생존 결정 능력]</h2>"
+                    + "<p>50:50 확률로 자신과 상대 중 한 명이 사망하는 도박성 능력입니다.</p>"
+                    + "<ul>"
+                    + "<li><b>능력 설명:</b> 자신과 상대 중 한 명이 무작위로 선택되어 사망합니다.</li>"
+                    + "<li><b>사용 방법:</b> 본인의 턴에 상대를 지목하면 확률에 따라 둘 중 한 명이 사망합니다.</li>"
+                    + "<li><b>쿨다운:</b> 라운드가 초기화될 때마다 사용 상태가 리셋되며, 매 라운드마다 사용할 수 있습니다.</li>"
+                    + "<li><b>전략 포인트:</b> 불리한 상황에서 역전을 노릴 수 있으나, 위험이 따릅니다.</li>"
+                    + "</ul>"
+                    + "</html>";
+        } else if (character instanceof Character4) {
+            description = "<html>"
+                    + "<h2>[기관총 발사 능력]</h2>"
+                    + "<p>기관총을 발사해 적 전체를 공격하는 강력한 공격형 능력입니다.</p>"
+                    + "<ul>"
+                    + "<li><b>능력 설명:</b> 기관총을 발사하여 적 전체에게 피해를 줍니다.</li>"
+                    + "<li><b>사용 조건:</b> 능력 사용시, 준비 상태가 되며 총알이 있어야 능력이 발동됩니다. 총알이 없어도 능력 사용으로 간주되며, 턴이 넘어갑니다.</li>"
+                    + "<li><b>쿨다운:</b> 라운드마다 초기화되며, 매 라운드마다 사용할 수 있습니다.</li>"
+                    + "<li><b>전략 포인트:</b> 적의 수가 많을 때 유리하며, 적 전체에 큰 피해를 줄 수 있습니다.</li>"
+                    + "</ul>"
+                    + "</html>";
+        } else if (character instanceof Character5) {
+            description = "<html>"
+                    + "<h2>[데미지 2배 능력]</h2>"
+                    + "<p>상대에게 입히는 데미지를 두 배로 증가시키는 결정적 능력입니다.</p>"
+                    + "<ul>"
+                    + "<li><b>능력 설명:</b> 총에 맞은 상대에게 데미지를 2배로 줍니다.</li>"
+                    + "<li><b>사용 조건:</b> 게임 전체에서 단 한 번만 사용할 수 있습니다.</li>"
+                    + "<li><b>전략 포인트:</b> 중요한 순간에 사용하여 승기를 잡을 수 있습니다.</li>"
+                    + "</ul>"
+                    + "</html>";
+        } else if (character instanceof Character6) {
+            description = "<html>"
+                    + "<h2>[힐러 능력]</h2>"
+                    + "<p>자신의 체력을 소모하여 아군의 체력을 회복할 수 있는 지원형 능력입니다.</p>"
+                    + "<ul>"
+                    + "<li><b>능력 설명:</b> 자신의 체력을 1 소모하고, 아군의 체력을 1 회복시킵니다.</li>"
+                    + "<li><b>사용 방법:</b> 본인의 턴에서 공격 대신 회복을 선택하여 사용합니다.</li>"
+                    + "<li><b>쿨다운:</b> 라운드마다 초기화되며, 매 라운드마다 다시 사용할 수 있습니다.</li>"
+                    + "<li><b>제약 사항:</b> 본인의 체력이 소진되면 더 이상 사용할 수 없습니다.</li>"
+                    + "</ul>"
+                    + "</html>";
+        } else {
+            description = "<html>"
+                    + "<h2>알 수 없는 캐릭터입니다.</h2>"
+                    + "<p>이 캐릭터에 대한 정보가 존재하지 않습니다.</p>"
+                    + "</html>";
+        }
+
+
+        // 커스텀 다이얼로그 생성
+        showCustomDialog(description, imagePath);
+    }
+
+    private static void showCustomDialog(String description, String imagePath) {
+        // 다이얼로그 설정
+        JDialog dialog = new JDialog();
+        dialog.setTitle("당신의 캐릭터 설명");
+        dialog.setSize(700, 700);
+        dialog.setLocationRelativeTo(null);
+        dialog.setModal(true);
+
+        // 메인 패널
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // 이미지 추가
+        JLabel imageLabel = new JLabel();
+        try {
+            ImageIcon icon = new ImageIcon(MainMenu.class.getResource(imagePath));
+            Image img = icon.getImage().getScaledInstance(dialog.getWidth() - 20, -1, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(img));
+            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        } catch (Exception e) {
+            imageLabel.setText("이미지를 불러올 수 없습니다.");
+            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+
+        // 설명 추가 (HTML을 지원하는 JLabel 사용)
+        JLabel descriptionLabel = new JLabel(description);
+        descriptionLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        descriptionLabel.setVerticalAlignment(SwingConstants.TOP);
+        descriptionLabel.setHorizontalAlignment(SwingConstants.LEFT);
+
+        // 설명 패널에 여백 추가
+        JPanel descriptionPanel = new JPanel(new BorderLayout());
+        descriptionPanel.setBackground(Color.WHITE);
+        descriptionPanel.add(descriptionLabel, BorderLayout.CENTER);
+        descriptionPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        // 닫기 버튼
+        JButton closeButton = new JButton("닫기");
+        closeButton.addActionListener(e -> dialog.dispose());
+        closeButton.setBackground(new Color(220, 53, 69));
+        closeButton.setForeground(Color.BLACK);
+        closeButton.setFocusPainted(false);
+        closeButton.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(closeButton);
+        buttonPanel.setBackground(Color.WHITE);
+
+        // 컴포넌트 배치
+        panel.add(imageLabel, BorderLayout.NORTH);
+        panel.add(descriptionPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.add(panel);
+        dialog.setVisible(true);
+    }
+
+
+
+
 }

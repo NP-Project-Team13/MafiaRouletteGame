@@ -2,18 +2,17 @@ package client;
 
 import characters.Character6;
 import characters.CharacterTemplate;
-import client.MafiaClient;
-import client.MainMenu;
 import resources.SoundPlayer;
 import server.ServerResponse;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static client.MainMenu.showCharacterDescriptions;
 
 public class GameUI {
     private JFrame frame;
@@ -26,6 +25,12 @@ public class GameUI {
     private int roundNumber = 1;
     private List<Boolean> bulletPositions;
     private JTextField chatInputField; // 채팅 입력 필드
+
+    private JScrollPane logScrollPane; // 게임 로그 패널을 멤버 변수로 선언
+
+    public boolean characterDescriptionShown = false; // 설명이 표시되었는지 여부
+
+
 
     public GameUI(MafiaClient client) {
         this.client = client; // 클라이언트 인스턴스 초기화
@@ -68,8 +73,10 @@ public class GameUI {
         gameLog.setFont(new Font("Monospaced", Font.PLAIN, 16)); // 글씨 크기 증가
         gameLog.setBackground(new Color(30, 30, 30));
         gameLog.setForeground(Color.WHITE);
-        JScrollPane logScrollPane = new JScrollPane(gameLog);
+
+        logScrollPane = new JScrollPane(gameLog);
         logScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY), "Game Log"));
+
 
         playerInfoPanel = new JPanel();
         playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.Y_AXIS));
@@ -113,11 +120,32 @@ public class GameUI {
     private void updatePlayerInfoPanel() {
         playerInfoPanel.removeAll();
         if (characters.isEmpty()) {
-            JLabel tempInfo = new JLabel("플레이어 정보가 아직 로드되지 않았습니다.", SwingConstants.CENTER);
+            playerInfoPanel.setLayout(new GridBagLayout());
+            playerInfoPanel.setBackground(Color.BLACK);
+            playerInfoPanel.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight())); // 패널 크기를 창 크기에 맞춤
+
+            JLabel tempInfo = new JLabel("", SwingConstants.CENTER);
             tempInfo.setForeground(Color.WHITE);
-            playerInfoPanel.add(tempInfo);
+            tempInfo.setFont(new Font("Serif", Font.BOLD, 35));
+//            tempInfo.setFont(loadCustomFont("/resources/Stylish.ttf", 30));
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.CENTER;
+
+            playerInfoPanel.add(tempInfo, gbc);
+
+
+            typeText(tempInfo, "다른 플레이어가 로드될 때까지 기다려주세요!");
+
+
         } else {
             for (CharacterTemplate character : characters) {
+                // 모든 캐릭터가 로드되면 로그 창을 보이게 설정
+                playerInfoPanel.setPreferredSize(new Dimension(300, frame.getHeight())); // 패널 폭을 300픽셀로 설정
+                playerInfoPanel.setLayout(new BoxLayout(playerInfoPanel, BoxLayout.Y_AXIS));
+
                 JPanel playerPanel = new JPanel();
                 playerPanel.setLayout(new GridBagLayout()); // GridBagLayout 사용
                 GridBagConstraints gbc = new GridBagConstraints();
@@ -295,18 +323,67 @@ public class GameUI {
     }
 
     private void goBack(JFrame frame) {
-        int confirm = JOptionPane.showConfirmDialog(
-                frame,
-                "뒤로 가시겠습니까? 진행 상황이 저장되지 않을 수 있습니다.",
-                "뒤로가기 확인",
-                JOptionPane.YES_NO_OPTION
-        );
-        if (confirm == JOptionPane.YES_OPTION) {
+        // 새로운 커스텀 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "뒤로가기 확인", true);
+        dialog.setSize(400, 180);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 라벨 추가
+        JLabel messageLabel = new JLabel("뒤로 가시겠습니까? 진행 상황이 저장되지 않을 수 있습니다.");
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(messageLabel, gbc);
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        // 예 버튼
+        JButton yesButton = new JButton("예");
+        styleButton(yesButton);
+        yesButton.addActionListener(e -> {
             frame.dispose(); // 현재 창 닫기
             System.out.println("뒤로가기 버튼 클릭됨. 메인 메뉴로 이동합니다.");
             MainMenu.createAndShowGUI(client, client.getGameUI()); // 메인 메뉴 화면으로 돌아가기
-        }
+            dialog.dispose();
+        });
+
+        // 아니오 버튼
+        JButton noButton = new JButton("아니오");
+        styleButton(noButton);
+        noButton.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(yesButton);
+        buttonPanel.add(noButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.setVisible(true);
     }
+
+    // 버튼 스타일을 설정하는 메서드
+    private void styleButton(JButton button) {
+        button.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        button.setPreferredSize(new Dimension(100, 40));
+        button.setFocusPainted(false);
+        button.setBackground(Color.WHITE);  // 버튼 배경을 흰색으로 설정
+        button.setForeground(Color.BLACK);  // 버튼 글씨 색상을 검정으로 설정
+        button.setBorder(new MafiaClient.RoundedBorder(20));
+    }
+
 
     // 서버 응답 처리 메소드 추가
     public void handleServerResponse(ServerResponse response) {
@@ -355,6 +432,7 @@ public class GameUI {
     }
 
     private void updateGameState(ServerResponse response) {
+
         // 플레이어 정보 업데이트
         characters = response.getCharacters();
 //        characterLog(response);
@@ -362,6 +440,7 @@ public class GameUI {
         // 현재 턴과 라운드 번호 업데이트
         currentPlayerIndex = response.getCurrentPlayerIndex();
         roundNumber = response.getRoundNumber();
+
         updateTurnLabel(); // 현재 턴 레이블 업데이트
         updatePlayerInfoPanel(); // 플레이어 정보 패널 업데이트
     }
@@ -390,4 +469,29 @@ public class GameUI {
 
         client.sendVote(mvpPlayer);
     }
+
+    private void typeText(JLabel label, String text) {
+        new Thread(() -> {
+            for (int i = 0; i <= text.length(); i++) {
+                final String subText = text.substring(0, i);
+                SwingUtilities.invokeLater(() -> label.setText(subText));
+                try {
+                    Thread.sleep(50); // 각 글자가 표시되는 속도 조절 (50밀리초)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public CharacterTemplate getAssignedCharacter(String nickname) {
+        // 현재 플레이어 리스트에서 닉네임과 일치하는 캐릭터를 반환
+        for (CharacterTemplate character : characters) {
+            if (character.getName().equals(nickname)) {
+                return character;
+            }
+        }
+        return null; // 일치하는 캐릭터가 없을 경우 null 반환
+    }
+
 }

@@ -12,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static client.MainMenu.showCharacterDescriptions;
+
 public class MafiaServer {
     private static final int PORT = 12345;
     private static final int MAX_PLAYERS = 4;
@@ -43,6 +45,7 @@ public class MafiaServer {
             waitForReady();
             System.out.println("모든 플레이어가 연결되었습니다. 게임을 시작합니다.");
             assignTeamsAndCharacters();
+
             startGame();
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,6 +92,7 @@ public class MafiaServer {
                 // 클라이언트에게 할당 정보 전달
 //                client.sendMessage("당신은 " + teams[i] + "팀입니다.");
 //                client.sendMessage("캐릭터: " + characterClass.getSimpleName() + " - 능력: " + character.getInfo());
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
