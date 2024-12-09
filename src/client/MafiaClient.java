@@ -55,6 +55,16 @@ public class MafiaClient {
 //                    }
 
                     gameUI.handleServerResponse(response);
+
+                    // 캐릭터 설명 게임 시작 직후 한 번만 보여줍니다.
+                    if (!gameUI.characterDescriptionShown) {
+                        CharacterTemplate myCharacter = getAssignedCharacter();
+                        if (myCharacter != null) {
+                            MainMenu.showCharacterDescriptions(myCharacter);
+                            gameUI.characterDescriptionShown = true;
+                        }
+                    }
+
                 }
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("서버와의 연결이 끊어졌습니다.");
@@ -113,6 +123,10 @@ public class MafiaClient {
         MafiaClient client = new MafiaClient(serverAddress, serverPort, nickname); // 클라이언트 인스턴스 생성
         client.start(); // 서버와의 연결 시작
         SwingUtilities.invokeLater(() -> new MainMenu().createAndShowGUI(client, client.gameUI));
+    }
+
+    public CharacterTemplate getAssignedCharacter() {
+        return gameUI.getAssignedCharacter(nickname);
     }
 
 }

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static client.MainMenu.showCharacterDescriptions;
+
 public class GameUI {
     private JFrame frame;
     private JTextArea gameLog;
@@ -25,6 +27,9 @@ public class GameUI {
     private JTextField chatInputField; // 채팅 입력 필드
 
     private JScrollPane logScrollPane; // 게임 로그 패널을 멤버 변수로 선언
+
+    public boolean characterDescriptionShown = false; // 설명이 표시되었는지 여부
+
 
 
     public GameUI(MafiaClient client) {
@@ -429,4 +434,15 @@ public class GameUI {
             }
         }).start();
     }
+
+    public CharacterTemplate getAssignedCharacter(String nickname) {
+        // 현재 플레이어 리스트에서 닉네임과 일치하는 캐릭터를 반환
+        for (CharacterTemplate character : characters) {
+            if (character.getName().equals(nickname)) {
+                return character;
+            }
+        }
+        return null; // 일치하는 캐릭터가 없을 경우 null 반환
+    }
+
 }

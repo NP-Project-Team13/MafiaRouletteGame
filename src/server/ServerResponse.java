@@ -38,6 +38,10 @@ public class ServerResponse implements Serializable {
     public ServerResponse() { // 게임 종료 시 전달하는 response 형태
         this.action = "end";
     }
+
+    public ServerResponse(String assignCharacter, String s, CharacterTemplate character) {
+    }
+
     private List<CharacterTemplate> deepCopyCharacters(List<CharacterTemplate> original) {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();

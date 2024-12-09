@@ -1,5 +1,6 @@
 package client;
 
+import characters.*;
 import client.MafiaClient;
 
 import javax.imageio.ImageIO;
@@ -72,6 +73,7 @@ public class MainMenu {
 
         // 버튼 이벤트
         startButton.addActionListener(e -> {
+            // 게임 시작
             frame.dispose();
             gameUI.createAndShowGUI();
             client.sendReady();
@@ -181,9 +183,9 @@ public class MainMenu {
                 // 새 창 위치 및 표시
                 historyPopup.setLocationRelativeTo(null);
                 historyPopup.setVisible(true);
+
             }
         });
-
 
 
         exitButton.addActionListener(e -> System.exit(0));
@@ -237,4 +239,48 @@ public class MainMenu {
 
         return button;
     }
+
+    public static void showCharacterDescriptions(CharacterTemplate character) {
+        String description;
+
+        if (character instanceof Character1) {
+            description = "캐릭터1: 총알의 위치를 확인하는 능력\n\n"
+                    + "이 캐릭터는 언제든지 비동기적으로 총알의 위치를 확인할 수 있습니다. "
+                    + "능력을 사용하면 즉시 총알이 어느 슬롯에 있는지 확인할 수 있습니다. "
+                    + "이 능력은 라운드마다 초기화되며, 매 라운드마다 다시 사용할 수 있습니다.";
+        } else if (character instanceof Character2) {
+            description = "캐릭터2: 총알을 튕겨내는 방어 능력\n\n"
+                    + "이 캐릭터는 비동기적으로 총알을 튕겨낼 준비를 할 수 있습니다. "
+                    + "능력을 사용하면 총에 맞을 경우 자동으로 총알을 튕겨냅니다. "
+                    + "이 능력은 라운드마다 초기화되며, 매 라운드마다 다시 사용할 수 있습니다.";
+        } else if (character instanceof Character3) {
+            description = "캐릭터3: 무작위 생존 결정 능력 ('나 아니면 너 OUT')\n\n"
+                    + "이 캐릭터는 무작위로 생존 여부를 결정합니다. "
+                    + "능력을 사용하면 준비가 완료되며, 본인의 턴에 한 명을 지목하면 50:50 확률로 둘 중 한 명이 사망합니다. "
+                    + "이 능력은 라운드마다 초기화되며, 매 라운드마다 다시 사용할 수 있습니다.";
+        } else if (character instanceof Character4) {
+            description = "캐릭터4: 기관총 발사 능력\n\n"
+                    + "이 캐릭터는 기관총을 발사하여 적 전체를 공격할 수 있습니다. "
+                    + "능력을 사용하면 기관총 발사 준비가 완료되며, 총알이 있으면 적 전체에게 데미지를 줍니다. "
+                    + "총알이 없으면 능력을 사용한 것으로 간주하고 턴이 종료됩니다. "
+                    + "이 능력은 라운드마다 초기화되며, 매 라운드마다 다시 사용할 수 있습니다.";
+        } else if (character instanceof Character5) {
+            description = "캐릭터5: 데미지 2배 능력\n\n"
+                    + "이 캐릭터는 상대가 총에 맞았을 때 데미지를 2배로 줄 수 있습니다. "
+                    + "이 능력은 전체 게임에서 단 1회만 사용할 수 있습니다. "
+                    + "신중하게 사용해야 하는 강력한 능력입니다.";
+        } else if (character instanceof Character6) {
+            description = "캐릭터6: 힐러 능력\n\n"
+                    + "이 캐릭터는 자신의 체력을 1 소모하여 아군의 체력을 1 회복할 수 있습니다. "
+                    + "능력을 사용하면 힐 준비가 완료되며, 본인의 턴에 'shoot' 버튼 대신 'heal' 버튼이 활성화됩니다. "
+                    + "힐을 사용하면 본인의 턴은 소모되며, 공격할 수 없습니다. "
+                    + "이 능력은 라운드마다 초기화되며, 매 라운드마다 다시 사용할 수 있습니다.";
+        } else {
+            description = "알 수 없는 캐릭터입니다.";
+        }
+
+        // 팝업 창으로 설명 표시
+        JOptionPane.showMessageDialog(null, description, "당신의 캐릭터 설명", JOptionPane.INFORMATION_MESSAGE);
+    }
+
 }
