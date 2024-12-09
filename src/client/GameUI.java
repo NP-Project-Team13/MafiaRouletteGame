@@ -537,7 +537,7 @@ public class GameUI {
     }
 
     private void saveHistoryToFile(String history) {
-        String filePath = "resources/history.txt";
+        String filePath = "src/resources/history.txt";
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
             writer.println(history); // history 기록 저장
             System.out.println("게임 기록이 저장되었습니다: " + history);

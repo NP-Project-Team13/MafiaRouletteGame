@@ -392,7 +392,7 @@ public class MafiaServer {
             //pw.println(history);
 
             for(ClientHandler client : clients){
-                client.sendMessage("history: "+history);
+                client.sendMessage("history:"+history);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
