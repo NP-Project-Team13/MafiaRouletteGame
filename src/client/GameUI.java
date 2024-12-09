@@ -55,7 +55,7 @@ public class GameUI {
         JButton backButton = new JButton("뒤로가기");
         backButton.setFont(new Font("Serif", Font.BOLD, 16));
         backButton.setBackground(new Color(80, 80, 80));
-        backButton.setForeground(Color.WHITE);
+        backButton.setForeground(Color.GRAY);
         backButton.addActionListener(e -> goBack(frame));
 
         turnLabel = new JLabel("게임 대기중", SwingConstants.CENTER);
@@ -471,10 +471,15 @@ public class GameUI {
     }
 
     private void typeText(JLabel label, String text) {
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 28f); // 폰트 크기 28포인트
+
         new Thread(() -> {
             for (int i = 0; i <= text.length(); i++) {
                 final String subText = text.substring(0, i);
-                SwingUtilities.invokeLater(() -> label.setText(subText));
+                SwingUtilities.invokeLater(() -> {
+                    label.setFont(dokdoFont);
+                    label.setText(subText);
+                });
                 try {
                     Thread.sleep(50); // 각 글자가 표시되는 속도 조절 (50밀리초)
                 } catch (InterruptedException e) {
@@ -483,6 +488,7 @@ public class GameUI {
             }
         }).start();
     }
+
 
     public CharacterTemplate getAssignedCharacter(String nickname) {
         // 현재 플레이어 리스트에서 닉네임과 일치하는 캐릭터를 반환
@@ -493,5 +499,16 @@ public class GameUI {
         }
         return null; // 일치하는 캐릭터가 없을 경우 null 반환
     }
+
+    private Font loadCustomFont(String path, float size) {
+        try {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream(path));
+            return font.deriveFont(size);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Font("나눔 고딕", Font.PLAIN, (int) size); // 기본 폰트로 대체
+        }
+    }
+
 
 }
