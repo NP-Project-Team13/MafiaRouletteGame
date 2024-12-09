@@ -323,18 +323,67 @@ public class GameUI {
     }
 
     private void goBack(JFrame frame) {
-        int confirm = JOptionPane.showConfirmDialog(
-                frame,
-                "뒤로 가시겠습니까? 진행 상황이 저장되지 않을 수 있습니다.",
-                "뒤로가기 확인",
-                JOptionPane.YES_NO_OPTION
-        );
-        if (confirm == JOptionPane.YES_OPTION) {
+        // 새로운 커스텀 다이얼로그 생성
+        JDialog dialog = new JDialog(frame, "뒤로가기 확인", true);
+        dialog.setSize(400, 180);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // 라벨 추가
+        JLabel messageLabel = new JLabel("뒤로 가시겠습니까? 진행 상황이 저장되지 않을 수 있습니다.");
+        messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        messageLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        dialog.add(messageLabel, gbc);
+
+        // 버튼 패널
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
+        // 예 버튼
+        JButton yesButton = new JButton("예");
+        styleButton(yesButton);
+        yesButton.addActionListener(e -> {
             frame.dispose(); // 현재 창 닫기
             System.out.println("뒤로가기 버튼 클릭됨. 메인 메뉴로 이동합니다.");
             MainMenu.createAndShowGUI(client, client.getGameUI()); // 메인 메뉴 화면으로 돌아가기
-        }
+            dialog.dispose();
+        });
+
+        // 아니오 버튼
+        JButton noButton = new JButton("아니오");
+        styleButton(noButton);
+        noButton.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(yesButton);
+        buttonPanel.add(noButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.setVisible(true);
     }
+
+    // 버튼 스타일을 설정하는 메서드
+    private void styleButton(JButton button) {
+        button.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        button.setPreferredSize(new Dimension(100, 40));
+        button.setFocusPainted(false);
+        button.setBackground(Color.WHITE);  // 버튼 배경을 흰색으로 설정
+        button.setForeground(Color.BLACK);  // 버튼 글씨 색상을 검정으로 설정
+        button.setBorder(new MafiaClient.RoundedBorder(20));
+    }
+
 
     // 서버 응답 처리 메소드 추가
     public void handleServerResponse(ServerResponse response) {

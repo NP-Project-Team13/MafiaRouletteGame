@@ -5,6 +5,8 @@ import resources.JsonUtil;
 import server.ServerResponse;
 
 import javax.swing.*;
+import javax.swing.border.AbstractBorder;
+import java.awt.*;
 import java.io.*;
 import java.net.*;
 
@@ -111,19 +113,78 @@ public class MafiaClient {
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Mafia Roulette Game");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
+        frame.setLocationRelativeTo(null);
 
-        // 클라이언트 연결 설정
+        // 닉네임 입력을 위한 커스터마이징된 패널 생성
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel label = new JLabel("닉네임을 입력해주세요.");
+        label.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(label, gbc);
+
+        JTextField nicknameField = new JTextField(15);
+        nicknameField.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        nicknameField.setPreferredSize(new Dimension(200, 40));
+        nicknameField.setBorder(new RoundedBorder(15)); // 둥근 테두리 적용
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(nicknameField, gbc);
+
+        int result = JOptionPane.showConfirmDialog(frame, panel, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String nickname = nicknameField.getText();
+            // 클라이언트 연결 설정
 //        String serverAddress = JOptionPane.showInputDialog(frame, "서버 주소를 입력하세요:", "localhost");
 //        int serverPort = Integer.parseInt(JOptionPane.showInputDialog(frame, "서버 포트를 입력하세요:", "12345"));
 //        String serverAddress = " 122.45.203.188";
-        String serverAddress = "localhost";
-        int serverPort = 12345;
-        String nickname = JOptionPane.showInputDialog(frame, "닉네임을 입력하세요: ");
+            String serverAddress = "localhost";
+            int serverPort = 12345;
 
-        MafiaClient client = new MafiaClient(serverAddress, serverPort, nickname); // 클라이언트 인스턴스 생성
-        client.start(); // 서버와의 연결 시작
-        SwingUtilities.invokeLater(() -> new MainMenu().createAndShowGUI(client, client.gameUI));
+            MafiaClient client = new MafiaClient(serverAddress, serverPort, nickname); // 클라이언트 인스턴스 생성
+            client.start(); // 서버와의 연결 시작
+            SwingUtilities.invokeLater(() -> new MainMenu().createAndShowGUI(client, client.gameUI));
+        } else {
+            System.exit(0);
+        }
     }
+
+    // 둥근 테두리를 위한 커스텀 Border 클래스
+    static class RoundedBorder extends AbstractBorder {
+        private final int radius;
+
+        public RoundedBorder(int radius) {
+            this.radius = radius;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setColor(Color.GRAY);
+            g2.setStroke(new BasicStroke(1));
+            g2.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+            g2.dispose();
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(radius, radius, radius, radius);
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c, Insets insets) {
+            insets.left = insets.right = insets.top = insets.bottom = radius;
+            return insets;
+        }
+    }
+
 
     public CharacterTemplate getAssignedCharacter() {
         return gameUI.getAssignedCharacter(nickname);
