@@ -29,6 +29,7 @@ public class Character1 extends CharacterTemplate {
         for (int i = 0; i < chambers.size(); i++) {
             result.append("슬롯 ").append(i + 1).append(": ").append(chambers.get(i) ? "총알 있음💥" : "빈 슬롯").append("\n");
         }
+        result.append("(슬롯 1이 현재 슬롯입니다.)");
 
         setAbilityUsed(true);
         return result.toString();
