@@ -40,6 +40,13 @@ public class Character5 extends CharacterTemplate {
         }
         result.append(name).append("님이 ").append(target.getName()).append("님에게 총을 발사하여 적중시켰습니다!✅\n");
         if (isReady) {
+            if(target instanceof Character2){
+                Character2 targetcharacter = (Character2)target;
+                if(targetcharacter.isReady){
+                    result.append(target.receiveDamage());
+                    return result.toString();
+                }
+            }
             result.append(target.decreaseHealth());
             result.append(target.decreaseHealth());
             result.append(" 데미지가 2배 적용되었습니다!\n");

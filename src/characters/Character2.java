@@ -3,7 +3,7 @@ package characters;
 
 public class Character2 extends CharacterTemplate {
 
-    private boolean isReady; // 총알 튕겨낼 준비 되었는지
+    public boolean isReady; // 총알 튕겨낼 준비 되었는지
 
     public Character2(String name, String team) {
         super(name, team, "총알 튕겨내는 방어 능력");
