@@ -40,9 +40,7 @@ public class ClientHandler implements Runnable {
             System.out.println("닉네임 입력 완료: " + getNickname()); // 디버깅용 로그
 
             while (true) {
-                System.out.println("요청 처리이이 "); // 디버깅용 로그
                 handleReq(); // 요청 처리
-
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -128,12 +126,6 @@ public class ClientHandler implements Runnable {
     protected void sendResponse(ServerResponse response) {
         try {
             // todo ClientHandler에서 sendResponse 전에 Characters의 health 확인
-//            if (!response.getAction().equals("message")) {
-//                for (CharacterTemplate ct :
-//                        response.getCharacters()) {
-//                    System.out.println(ct.getHealth());
-//                }
-//            }
             out.writeObject(response);
         } catch (IOException e) {
             throw new RuntimeException(e);

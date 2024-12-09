@@ -205,6 +205,19 @@ public class MafiaServer {
                 .findFirst()
                 .orElse(null);
 
+        // shooter가 Character6이고, 같은 팀에 죽은 플레이어가 있는지 확인
+        if (shooter.getCharacter() instanceof Character6) {
+            boolean isTeammateDead = clients.stream()
+                    .filter(client -> client != shooter) // shooter 자신 제외
+                    .anyMatch(client -> client.getTeam().equals(shooter.getTeam()) && !client.getCharacter().isAlive());
+
+            if (isTeammateDead) {
+                // resetRound 호출 및 결과 메시지 추가
+                shooter.getCharacter().resetRound();
+            }
+        }
+
+
         if (target == null) {
             return new ServerResponse("error", "타겟 플레이어를 찾을 수 없습니다.", null, null, currentRound, currentTurnIndex);
         }
