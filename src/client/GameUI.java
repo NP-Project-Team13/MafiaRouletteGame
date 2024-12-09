@@ -616,7 +616,7 @@ public class GameUI {
         // 메시지 라벨
         JLabel messageLabel = new JLabel("투표 결과 MVP는 " + mvpPlayer + "님입니다!");
         messageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-        messageLabel.setForeground(Color.WHITE);
+        messageLabel.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 0;
         dialog.add(messageLabel, gbc);
@@ -635,9 +635,8 @@ public class GameUI {
         button.setFont(new Font("맑은 고딕", Font.BOLD, 16));
         button.setPreferredSize(new Dimension(100, 40));
         button.setFocusPainted(false);
-        button.setBackground(new Color(50, 150, 250));
+        button.setBackground(Color.WHITE);
         button.setForeground(Color.BLACK);
-        button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
