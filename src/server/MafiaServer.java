@@ -218,7 +218,13 @@ public class MafiaServer {
             message = shooter.getCharacter().shoot(target.getCharacter());
         } else {
             action = "miss";
-            message = shooter.getNickname() + "님이 " + targetNickname + "님을 빗맞췄습니다!❌";
+
+            // target의 캐릭터가 Character6 타입인지 확인
+            if ((shooter.getCharacter() instanceof Character6) && ((Character6) shooter.getCharacter()).isReady()) {
+                message = shooter.getNickname() + "님이 " + targetNickname + "님의 체력을 증가시켜주려고 했으나, 총알이 없어 무효처리 됩니다.";
+            } else {
+                message = shooter.getNickname() + "님이 " + targetNickname + "님을 빗맞췄습니다!❌";
+            }
         }
 
         ServerResponse response = new ServerResponse(action, message, collectCharacters(), Gun.getChambers(), currentRound, currentTurnIndex);

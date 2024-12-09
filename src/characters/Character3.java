@@ -27,7 +27,7 @@ public class Character3 extends CharacterTemplate {
             result.append(target.receiveDamage());
         } else {
             result.append("\n").append(name).append("님은 ").append(target.getName())
-                    .append("님과 함께 대박 아니면 쪽박 능력이 적용됩니다.\n");
+                    .append("님과 함께 나 아니면 너 OUT 능력이 적용됩니다.\n");
             if (new Random().nextBoolean()) {
                 result.append("\n").append(name).append("님은 죽음의 도박에서 살아남았습니다.\n")
                         .append(target.getName()).append("님은 사망했습니다☠️.\n");
