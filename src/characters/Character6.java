@@ -6,7 +6,7 @@ public class Character6 extends CharacterTemplate {
     private boolean isReady; // 힐 능력 사용 준비 여부 (true 가 되면 shoot 메서드는 공격이 아닌 힐 역할을 수행)
 
     public Character6(String name, String team) {
-        super(name, team, "자신의 health -1 소모하여 아군을 health +1");
+        super(name, team, "힐러 능력");
     }
 
     @Override

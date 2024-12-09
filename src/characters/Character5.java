@@ -6,7 +6,7 @@ public class Character5 extends CharacterTemplate {
     protected boolean isReady; // 능력 발동 여부
 
     public Character5(String name, String team) {
-        super(name, team, "상대가 총에 맞으면 데미지 2배 주기");
+        super(name, team, "데미지 2배 주는 능력");
     }
 
     @Override

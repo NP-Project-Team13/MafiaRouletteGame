@@ -53,14 +53,17 @@ public class GameUI {
         topPanel.setOpaque(false);
 
         JButton backButton = new JButton("뒤로가기");
-        backButton.setFont(new Font("Serif", Font.BOLD, 16));
+        backButton.setFont(new Font("나눔 고딕", Font.BOLD, 16));
         backButton.setBackground(new Color(80, 80, 80));
         backButton.setForeground(Color.GRAY);
         backButton.addActionListener(e -> goBack(frame));
 
+        // 커스텀 폰트 불러오기
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 28f);
         turnLabel = new JLabel("게임 대기중", SwingConstants.CENTER);
-        turnLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        turnLabel.setFont(dokdoFont); // 불러온 커스텀 폰트 적용
         turnLabel.setForeground(Color.RED);
+
 
         topPanel.add(backButton, BorderLayout.WEST);
         topPanel.add(turnLabel, BorderLayout.CENTER);
@@ -185,7 +188,7 @@ public class GameUI {
                 // 능력 정보
                 JLabel playerInfo2 = new JLabel(String.format(" [능력] %s", character.getInfo()));
                 playerInfo2.setForeground(Color.WHITE); // 글씨 색상 흰색
-                playerInfo2.setFont(new Font("Serif", Font.BOLD, 16)); // 글씨 크기 증가
+                playerInfo2.setFont(new Font("나눔 고딕", Font.BOLD, 16)); // 글씨 크기 증가
 
                 gbc.gridx = 0;
                 gbc.gridy = 2;
@@ -268,8 +271,11 @@ public class GameUI {
     }
 
     private void updateTurnLabel() {
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 35f); // 원하는 크기로 설정
+        turnLabel.setFont(dokdoFont);
         turnLabel.setText("현재 턴: " + characters.get(currentPlayerIndex).getName() + " | 라운드: " + roundNumber);
     }
+
 
     private CharacterTemplate selectTarget(String message) {
         // 상대 플레이어의 팀을 가져옴
@@ -471,7 +477,7 @@ public class GameUI {
     }
 
     private void typeText(JLabel label, String text) {
-        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 28f); // 폰트 크기 28포인트
+        Font dokdoFont = loadCustomFont("/resources/Dokdo.ttf", 40f);
 
         new Thread(() -> {
             for (int i = 0; i <= text.length(); i++) {

@@ -7,7 +7,7 @@ import resources.Gun;
 public class Character1 extends CharacterTemplate {
 
     public Character1(String name, String team) {
-        super(name, team, "총알 위치를 확인하는 능력");
+        super(name, team, "총알 위치 확인 능력");
     }
 
     @Override
