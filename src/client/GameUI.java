@@ -344,6 +344,7 @@ public class GameUI {
         gbc.gridy = 2;
         dialog.add(buttonPanel, gbc);
 
+        dialog.pack(); // 다이얼로그 크기 조정
         dialog.setVisible(true);
 
         return (CharacterTemplate) targetComboBox.getSelectedItem();
